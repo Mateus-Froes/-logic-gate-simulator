@@ -1,0 +1,60 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Core (Terminal)",
+            "type": "shell",
+            "command": "g++",
+            "args": [
+                "-std=c++17",
+                "-Wall",
+                "-Wextra",
+                "-Iinclude",
+                "src/Component.cpp",
+                "src/Wire.cpp",
+                "src/Gates.cpp",
+                "src/CircuitBoard.cpp",
+                "src/main.cpp",
+                "-o",
+                "build/simulador.exe"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": ["$gcc"],
+            "group": "build"
+        },
+        {
+            "label": "Build GUI (SFML 3)",
+            "type": "shell",
+            "command": "g++",
+            "args": [
+                "-std=c++17",
+                "-Wall",
+                "-Wextra",
+                "-Iinclude",
+                "src/Component.cpp",
+                "src/Wire.cpp",
+                "src/Gates.cpp",
+                "src/CircuitBoard.cpp",
+                "src/gui/GuiRenderer.cpp",
+                "src/gui/Sidebar.cpp",
+                "src/gui/GuiApplication.cpp",
+                "src/gui/main_gui.cpp",
+                "-o",
+                "build/simulador_gui.exe",
+                "-lsfml-graphics",
+                "-lsfml-window",
+                "-lsfml-system"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": ["$gcc"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}
