@@ -11,7 +11,7 @@
 #include "../../include/gui/GuiApplication.h"
 #endif
 
-/** @brief Ponto de entrada da aplicação gráfica do simulador de portas lógicas. */
+/** Ponto de entrada da aplicação gráfica do simulador. */
 int main(int argc, char* argv[]) {
     try {
         CircuitBoard board;
