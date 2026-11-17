@@ -18,7 +18,7 @@ const sf::Color COLOR_SIDEBAR_TEXT(235, 235, 240);
 const sf::Color COLOR_TITLE(150, 190, 255);
 }
 
-/** @brief Constrói a barra lateral e posiciona todos os botões de ferramentas. */
+// Cria a barra lateral e adiciona todos os botões na ordem certa
 Sidebar::Sidebar() : selectedInputs(2), deleteMode(false) {
     float y = 50.0f;
     const float h = 34.0f;
@@ -44,19 +44,19 @@ Sidebar::Sidebar() : selectedInputs(2), deleteMode(false) {
     addButton(y, h, "LIMPAR PLACA", ToolAction::ClearAll);
 }
 
-/** @brief Adiciona um novo botão à lista interna da barra lateral. */
+// Guarda um botão novo no vetor da barra lateral
 void Sidebar::addButton(float y, float height, const std::string& label, ToolAction action,
                         float x, float width) {
     buttons.push_back(Button{sf::FloatRect({x, y}, {width, height}), label, action});
 }
 
-/** @brief Verifica se um botão de seleção de número de entradas está atualmente selecionado. */
+// Vê se o botão de 2 ou 3 entradas está ativo
 bool Sidebar::isSelected(const Button& button) const {
     return (button.action == ToolAction::SetInputs2 && selectedInputs == 2) ||
            (button.action == ToolAction::SetInputs3 && selectedInputs == 3);
 }
 
-/** @brief Processa um clique na barra lateral e retorna a ação correspondente ao botão atingido. */
+// Verifica qual botão foi clicado e já atualiza o estado da barra lateral
 ToolAction Sidebar::handleClick(sf::Vector2f point) {
     for (Button& button : buttons) {
         if (button.area.contains(point)) {
@@ -73,18 +73,18 @@ ToolAction Sidebar::handleClick(sf::Vector2f point) {
     return ToolAction::None;
 }
 
-/** @brief Verifica se o ponto informado está dentro dos limites da barra lateral. */
+// Retorna true se a posição X cair dentro da barra lateral
 bool Sidebar::contains(sf::Vector2f point) const {
     return point.x >= 0.0f && point.x < WIDTH;
 }
 
-/** @brief Retorna a quantidade de entradas selecionada (2 ou 3) para novas portas lógicas. */
+// Quantidade de entradas escolhida (2 ou 3)
 size_t Sidebar::getSelectedInputs() const { return selectedInputs; }
 
-/** @brief Retorna true se o modo de exclusão estiver ativo. */
+// Retorna se o modo de exclusão está ativo
 bool Sidebar::isDeleteMode() const { return deleteMode; }
 
-/** @brief Ativa ou desativa o modo de exclusão e atualiza o rótulo do botão correspondente. */
+// Liga ou desliga o modo excluir e troca o texto do botão
 void Sidebar::setDeleteMode(bool enabled) {
     deleteMode = enabled;
     for (Button& button : buttons) {
@@ -94,7 +94,7 @@ void Sidebar::setDeleteMode(bool enabled) {
     }
 }
 
-/** @brief Desenha o fundo da barra lateral, os títulos das seções e todos os botões. */
+// Desenha o painel lateral, os títulos das seções e cada botão
 void Sidebar::draw(sf::RenderTarget& target, const GuiRenderer& renderer,
                    sf::Vector2f mouse, float height) const {
     sf::RectangleShape panel({WIDTH, height});

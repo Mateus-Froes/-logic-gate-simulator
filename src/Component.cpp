@@ -7,37 +7,37 @@
 #include "../include/Component.h"
 #endif
 
-/** @brief Inicializa um componente com identificador, nome e coordenadas na placa. */
+// Inicializa o componente com id, nome e posição
 Component::Component(int compId, const std::string& compName, float x, float y)
     : id(compId), name(compName), posX(x), posY(y) {}
 
-/** @brief Destrói o componente. */
+// Destrutor padrão
 Component::~Component() = default;
 
-/** @brief Retorna o identificador único do componente. */
+// Retorna o ID
 int Component::getId() const { return id; }
 
-/** @brief Retorna o nome do componente. */
+// Retorna o nome
 std::string Component::getName() const { return name; }
 
-/** @brief Retorna a coordenada X do componente. */
+// Retorna a posição X
 float Component::getX() const { return posX; }
 
-/** @brief Retorna a coordenada Y do componente. */
+// Retorna a posição Y
 float Component::getY() const { return posY; }
 
-/** @brief Define a posição do componente usando coordenadas X e Y. */
+// Muda a posição X e Y na placa
 void Component::setPosition(float x, float y) {
     posX = x;
     posY = y;
 }
 
-/** @brief Define a posição do componente a partir de um par de coordenadas (X, Y). */
+// Muda a posição usando um std::pair
 void Component::setPosition(const std::pair<float, float>& pos) {
     setPosition(pos.first, pos.second);
 }
 
-/** @brief Formata e insere as informações do componente em uma stream de saída. */
+// Imprime o componente formatado (id, nome, posição e saída)
 std::ostream& operator<<(std::ostream& os, const Component& comp) {
     os << "[" << comp.id << "] " << comp.name
        << " @(" << comp.posX << ", " << comp.posY << ")";

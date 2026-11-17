@@ -8,7 +8,7 @@
 #endif
 #include <iostream>
 
-/** @brief Inicializa a placa de circuito com a capacidade inicial informada. */
+// Aloca os arrays de componentes e fios com a capacidade inicial
 CircuitBoard::CircuitBoard(size_t initialCapacity)
     : components(nullptr), compCount(0), compCapacity(initialCapacity),
       wires(nullptr), wireCount(0), wireCapacity(initialCapacity) {
@@ -16,14 +16,14 @@ CircuitBoard::CircuitBoard(size_t initialCapacity)
     wires = new Wire*[wireCapacity];
 }
 
-/** @brief Constrói uma nova placa como cópia profunda de outra placa existente. */
+// Construtor de cópia: cria uma placa nova copiando tudo da outra
 CircuitBoard::CircuitBoard(const CircuitBoard& other)
     : components(nullptr), compCount(0), compCapacity(0),
       wires(nullptr), wireCount(0), wireCapacity(0) {
     copyFrom(other);
 }
 
-/** @brief Substitui o conteúdo desta placa por uma cópia profunda de outra placa. */
+// Operador de atribuição: limpa o que tinha antes e copia da outra placa
 CircuitBoard& CircuitBoard::operator=(const CircuitBoard& other) {
     if (this != &other) {
         clearMemory();
@@ -32,12 +32,12 @@ CircuitBoard& CircuitBoard::operator=(const CircuitBoard& other) {
     return *this;
 }
 
-/** @brief Destrói a placa e libera todos os componentes e fios alocados. */
+// Destrutor: apaga toda a memória alocada dinamicamente
 CircuitBoard::~CircuitBoard() {
     clearMemory();
 }
 
-/** @brief Libera toda a memória alocada para componentes e fios. */
+// Deleta cada fio e cada componente e depois libera os vetores
 void CircuitBoard::clearMemory() {
     for (size_t i = 0; i < wireCount; ++i) {
         delete wires[i];
@@ -57,7 +57,7 @@ void CircuitBoard::clearMemory() {
     wireCapacity = 0;
 }
 
-/** @brief Copia profundamente todos os componentes e fios de outra placa. */
+// Clona os componentes da outra placa e reconecta os fios nos clones novos
 void CircuitBoard::copyFrom(const CircuitBoard& other) {
     compCapacity = other.compCapacity;
     compCount = other.compCount;
@@ -83,17 +83,17 @@ void CircuitBoard::copyFrom(const CircuitBoard& other) {
     }
 }
 
-/** @brief Dobra a capacidade do array interno de componentes. */
+// Dobra o espaço do array de componentes
 void CircuitBoard::resizeComponents() {
     growArray(components, compCount, compCapacity);
 }
 
-/** @brief Dobra a capacidade do array interno de fios. */
+// Dobra o espaço do array de fios
 void CircuitBoard::resizeWires() {
     growArray(wires, wireCount, wireCapacity);
 }
 
-/** @brief Busca e retorna um componente pelo seu ID, ou nullptr se não encontrado. */
+// Procura um componente pelo ID no array
 Component* CircuitBoard::findComponent(int id) const {
     for (size_t i = 0; i < compCount; ++i) {
         if (components[i]->getId() == id) return components[i];
@@ -101,7 +101,7 @@ Component* CircuitBoard::findComponent(int id) const {
     return nullptr;
 }
 
-/** @brief Cria um fio conectando a saída do componente de origem à entrada do componente de destino. */
+// Cria um fio ligando a saída de src na entrada dstPinIndex de dst
 bool CircuitBoard::connect(Component* src, Component* dst, size_t dstPinIndex) {
     if (!src || !dst || src == dst) return false;
 
@@ -121,12 +121,12 @@ bool CircuitBoard::connect(Component* src, Component* dst, size_t dstPinIndex) {
     return true;
 }
 
-/** @brief Cria um fio conectando dois componentes identificados pelos seus IDs. */
+// Faz a conexão buscando os componentes pelo ID
 bool CircuitBoard::connect(int srcId, int dstId, size_t dstPinIndex) {
     return connect(findComponent(srcId), findComponent(dstId), dstPinIndex);
 }
 
-/** @brief Remove um fio específico a partir do seu índice no array de fios. */
+// Apaga um fio do array e atualiza o status dos pinos que estavam nele
 bool CircuitBoard::removeWireAt(size_t wireIndex) {
     if (wireIndex >= wireCount) return false;
 
@@ -154,7 +154,7 @@ bool CircuitBoard::removeWireAt(size_t wireIndex) {
     return true;
 }
 
-/** @brief Remove o fio conectado ao pino de entrada especificado de um componente pelo ID. */
+// Acha e remove o fio ligado nessa entrada específica do componente
 bool CircuitBoard::disconnect(int dstId, size_t dstPinIndex) {
     for (size_t i = 0; i < wireCount; ++i) {
         if (wires[i]->getDestId() == dstId && wires[i]->getDestPinIndex() == dstPinIndex) {
@@ -164,12 +164,12 @@ bool CircuitBoard::disconnect(int dstId, size_t dstPinIndex) {
     return false;
 }
 
-/** @brief Remove o fio conectado ao pino de entrada especificado de um componente pelo ponteiro. */
+// Desconecta a entrada passando o ponteiro do componente
 bool CircuitBoard::disconnect(Component* dst, size_t dstPinIndex) {
     return dst ? disconnect(dst->getId(), dstPinIndex) : false;
 }
 
-/** @brief Remove todos os fios que partem do pino de saída do componente informado. */
+// Remove todos os fios que saem do componente com esse ID
 size_t CircuitBoard::disconnectOutput(int srcId) {
     size_t removed = 0;
     for (size_t i = wireCount; i-- > 0;) {
@@ -181,7 +181,7 @@ size_t CircuitBoard::disconnectOutput(int srcId) {
     return removed;
 }
 
-/** @brief Remove um componente pelo ID juntamente com todos os fios conectados a ele. */
+// Tira todos os fios ligados no componente e depois deleta ele do array
 bool CircuitBoard::removeComponent(int id) {
     size_t compIndex = compCount;
     for (size_t i = 0; i < compCount; ++i) {
@@ -206,12 +206,12 @@ bool CircuitBoard::removeComponent(int id) {
     return true;
 }
 
-/** @brief Remove um componente pelo ponteiro juntamente com todos os fios conectados a ele. */
+// Remove o componente passando o ponteiro dele
 bool CircuitBoard::removeComponent(Component* comp) {
     return comp ? removeComponent(comp->getId()) : false;
 }
 
-/** @brief Remove todos os componentes e fios, deixando a placa vazia. */
+// Apaga todos os componentes e fios, zerando as contagens da placa
 void CircuitBoard::clear() {
     for (size_t i = 0; i < wireCount; ++i) {
         delete wires[i];
@@ -224,7 +224,7 @@ void CircuitBoard::clear() {
     compCount = 0;
 }
 
-/** @brief Executa a avaliação dos componentes e a propagação de sinais pelos fios até estabilizar o circuito. */
+// Avalia as portas e propaga os fios várias vezes até o circuito todo atualizar
 void CircuitBoard::stepSimulation() {
     for (size_t pass = 0; pass < compCount; ++pass) {
         for (size_t i = 0; i < compCount; ++i) {
@@ -236,7 +236,7 @@ void CircuitBoard::stepSimulation() {
     }
 }
 
-/** @brief Exibe no console o estado atual de todos os componentes da placa. */
+// Imprime todos os componentes e o resumo da placa no cout
 void CircuitBoard::printCircuitStatus() const {
     std::cout << "=== Estado da Placa (" << compCount << " componentes, "
               << wireCount << " trilhas) ===\n";
@@ -245,23 +245,23 @@ void CircuitBoard::printCircuitStatus() const {
     }
 }
 
-/** @brief Retorna a quantidade atual de componentes na placa. */
+// Retorna o total de componentes
 size_t CircuitBoard::getComponentCount() const { return compCount; }
 
-/** @brief Retorna o componente armazenado no índice informado, ou nullptr se fora do intervalo. */
+// Retorna o componente na posição index (ou nullptr se for inválido)
 Component* CircuitBoard::getComponent(size_t index) const {
     return (index < compCount) ? components[index] : nullptr;
 }
 
-/** @brief Retorna a quantidade atual de fios na placa. */
+// Retorna o total de fios
 size_t CircuitBoard::getWireCount() const { return wireCount; }
 
-/** @brief Retorna o fio armazenado no índice informado, ou nullptr se fora do intervalo. */
+// Retorna o fio na posição index (ou nullptr se for inválido)
 const Wire* CircuitBoard::getWire(size_t index) const {
     return (index < wireCount) ? wires[index] : nullptr;
 }
 
-/** @brief Retorna o próximo identificador numérico disponível para criação de componente. */
+// Pega o maior ID usado até agora e soma 1 pra gerar um novo
 int CircuitBoard::nextFreeId() const {
     int maxId = 0;
     for (size_t i = 0; i < compCount; ++i) {
@@ -270,7 +270,7 @@ int CircuitBoard::nextFreeId() const {
     return maxId + 1;
 }
 
-/** @brief Verifica se o pino de entrada especificado de um componente já possui um fio conectado. */
+// Verifica se já existe algum fio ligado nesse pino de entrada
 bool CircuitBoard::isInputConnected(int dstId, size_t pinIndex) const {
     for (size_t i = 0; i < wireCount; ++i) {
         if (wires[i]->getDestId() == dstId && wires[i]->getDestPinIndex() == pinIndex) {

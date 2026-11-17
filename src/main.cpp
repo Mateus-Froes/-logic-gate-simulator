@@ -9,7 +9,7 @@
 #include "../include/Gates.h"
 #endif
 
-/** @brief Ponto de entrada da versão de terminal para simulação e teste de cópia do circuito. */
+// Main de teste pelo terminal: monta um circuito e testa a cópia profunda da placa
 int main() {
     CircuitBoard board;
 

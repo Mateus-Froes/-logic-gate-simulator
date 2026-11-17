@@ -12,10 +12,10 @@ protected:
     Pin<bool> outputPin;
 
 public:
-    /** @brief Constrói uma porta lógica básica com um pino de saída inicializado em falso. */
+    // Porta lógica genérica, já começa com a saída em 0 (false)
     LogicGate(int compId, const std::string& compName, float x, float y);
 
-    /** @brief Retorna o ponteiro para o pino de saída da porta lógica. */
+    // Pega o pino de saída da porta
     Pin<bool>* getOutputPin() override;
 };
 
@@ -24,13 +24,13 @@ protected:
     Pin<bool> inputPin;
 
 public:
-    /** @brief Constrói uma porta lógica unária com um único pino de entrada. */
+    // Porta de 1 entrada só (usada como base pro NOT)
     UnaryGate(int compId, const std::string& compName, float x, float y);
 
-    /** @brief Retorna o pino de entrada se o índice for 0, ou nullptr caso contrário. */
+    // Só tem o pino 0; qualquer outro índice retorna nullptr
     Pin<bool>* getInputPin(size_t index = 0) override;
 
-    /** @brief Retorna a quantidade de entradas da porta unária (sempre 1). */
+    // Sempre tem 1 entrada
     size_t getInputCount() const override;
 };
 
@@ -39,88 +39,88 @@ protected:
     std::vector<Pin<bool>> inputPins;
 
 public:
-    /** @brief Constrói uma porta lógica com múltiplas entradas (2 ou 3 pinos). */
+    // Porta com várias entradas (aceita 2 ou 3 pinos)
     MultiInputGate(int compId, const std::string& compName, size_t numInputs, float x, float y);
 
-    /** @brief Retorna o ponteiro para o pino de entrada no índice especificado, ou nullptr se fora do intervalo. */
+    // Pega o pino de entrada pelo índice, se for válido
     Pin<bool>* getInputPin(size_t index = 0) override;
 
-    /** @brief Retorna o número de entradas configuradas na porta. */
+    // Quantas entradas foram configuradas nessa porta
     size_t getNumInputs() const;
 
-    /** @brief Retorna a quantidade total de pinos de entrada da porta. */
+    // Total de pinos de entrada
     size_t getInputCount() const override;
 };
 
 class NotGate : public UnaryGate {
 public:
-    /** @brief Constrói uma porta lógica inversora (NOT). */
+    // Cria uma porta NOT (inversora)
     NotGate(int compId, float x = 0.0f, float y = 0.0f);
 
-    /** @brief Inverte o valor lógico da entrada e armazena no pino de saída. */
+    // Inverte o valor que está na entrada
     void evaluate() override;
 
-    /** @brief Retorna uma cópia alocada dinamicamente desta porta NOT. */
+    // Clona a porta NOT
     Component* clone() const override;
 };
 
 class AndGate : public MultiInputGate {
 public:
-    /** @brief Constrói uma porta lógica AND com 2 ou 3 entradas. */
+    // Cria uma porta AND de 2 ou 3 entradas
     AndGate(int compId, size_t numInputs = 2, float x = 0.0f, float y = 0.0f);
 
-    /** @brief Define a saída como verdadeira somente se todas as entradas forem verdadeiras. */
+    // Saída só dá 1 se todas as entradas forem 1
     void evaluate() override;
 
-    /** @brief Retorna uma cópia alocada dinamicamente desta porta AND. */
+    // Clona a porta AND
     Component* clone() const override;
 };
 
 class NandGate : public MultiInputGate {
 public:
-    /** @brief Constrói uma porta lógica NAND com 2 ou 3 entradas. */
+    // Cria uma porta NAND de 2 ou 3 entradas
     NandGate(int compId, size_t numInputs = 2, float x = 0.0f, float y = 0.0f);
 
-    /** @brief Define a saída como o inverso da operação AND sobre todas as entradas. */
+    // Faz o inverso da AND (só dá 0 se tudo for 1)
     void evaluate() override;
 
-    /** @brief Retorna uma cópia alocada dinamicamente desta porta NAND. */
+    // Clona a porta NAND
     Component* clone() const override;
 };
 
 class OrGate : public MultiInputGate {
 public:
-    /** @brief Constrói uma porta lógica OR com 2 ou 3 entradas. */
+    // Cria uma porta OR de 2 ou 3 entradas
     OrGate(int compId, size_t numInputs = 2, float x = 0.0f, float y = 0.0f);
 
-    /** @brief Define a saída como verdadeira se ao menos uma das entradas for verdadeira. */
+    // Saída dá 1 se pelo menos uma entrada for 1
     void evaluate() override;
 
-    /** @brief Retorna uma cópia alocada dinamicamente desta porta OR. */
+    // Clona a porta OR
     Component* clone() const override;
 };
 
 class NorGate : public MultiInputGate {
 public:
-    /** @brief Constrói uma porta lógica NOR com 2 ou 3 entradas. */
+    // Cria uma porta NOR de 2 ou 3 entradas
     NorGate(int compId, size_t numInputs = 2, float x = 0.0f, float y = 0.0f);
 
-    /** @brief Define a saída como verdadeira somente se todas as entradas forem falsas. */
+    // Inverso da OR: só dá 1 quando todas as entradas são 0
     void evaluate() override;
 
-    /** @brief Retorna uma cópia alocada dinamicamente desta porta NOR. */
+    // Clona a porta NOR
     Component* clone() const override;
 };
 
 class XorGate : public MultiInputGate {
 public:
-    /** @brief Constrói uma porta lógica XOR com 2 ou 3 entradas. */
+    // Cria uma porta XOR de 2 ou 3 entradas
     XorGate(int compId, size_t numInputs = 2, float x = 0.0f, float y = 0.0f);
 
-    /** @brief Define a saída como verdadeira se uma quantidade ímpar de entradas for verdadeira. */
+    // Dá 1 quando tem uma quantidade ímpar de entradas ligadas
     void evaluate() override;
 
-    /** @brief Retorna uma cópia alocada dinamicamente desta porta XOR. */
+    // Clona a porta XOR
     Component* clone() const override;
 };
 
@@ -129,29 +129,29 @@ private:
     Pin<bool> outputPin;
 
 public:
-    /** @brief Constrói uma chave de entrada manual com estado lógico inicial configurável. */
+    // Chave de entrada que o usuário pode ligar/desligar
     InputSwitch(int compId, const std::string& compName, bool initialState = false,
                 float x = 0.0f, float y = 0.0f);
 
-    /** @brief Alterna o estado lógico atual da chave entre verdadeiro e falso. */
+    // Inverte o estado atual da chave (0 <-> 1)
     void toggle();
 
-    /** @brief Define explicitamente o estado lógico de saída da chave. */
+    // Força um estado específico na chave
     void setState(bool state);
 
-    /** @brief Mantém o estado atual da chave durante o ciclo de avaliação. */
+    // A chave não precisa calcular nada, só mantém o valor dela
     void evaluate() override;
 
-    /** @brief Retorna uma cópia alocada dinamicamente desta chave de entrada. */
+    // Clona a chave
     Component* clone() const override;
 
-    /** @brief Retorna o ponteiro para o pino de saída da chave. */
+    // Pega o pino de saída da chave
     Pin<bool>* getOutputPin() override;
 
-    /** @brief Retorna nullptr, pois chaves de entrada não possuem pinos de entrada. */
+    // Chave não tem entrada, então retorna nullptr
     Pin<bool>* getInputPin(size_t index = 0) override;
 
-    /** @brief Retorna 0, indicando que a chave não possui entradas. */
+    // 0 entradas
     size_t getInputCount() const override;
 };
 
@@ -160,25 +160,25 @@ private:
     Pin<bool> inputPin;
 
 public:
-    /** @brief Constrói um LED indicador de saída. */
+    // LED pra mostrar o resultado de saída do circuito
     OutputLED(int compId, const std::string& compName, float x = 0.0f, float y = 0.0f);
 
-    /** @brief Retorna true se o sinal recebido no pino de entrada estiver em nível lógico alto. */
+    // Diz se o LED está aceso (entrada em 1)
     bool isLit() const;
 
-    /** @brief Mantém o estado recebido na entrada durante o ciclo de avaliação. */
+    // O LED só lê a entrada, não tem saída pra calcular
     void evaluate() override;
 
-    /** @brief Retorna uma cópia alocada dinamicamente deste LED. */
+    // Clona o LED
     Component* clone() const override;
 
-    /** @brief Retorna nullptr, pois o LED não possui pino de saída. */
+    // LED não tem pino de saída
     Pin<bool>* getOutputPin() override;
 
-    /** @brief Retorna o ponteiro para o único pino de entrada do LED (índice 0). */
+    // Pega o pino de entrada do LED (índice 0)
     Pin<bool>* getInputPin(size_t index = 0) override;
 
-    /** @brief Retorna 1, indicando que o LED possui apenas uma entrada. */
+    // LED tem só 1 entrada
     size_t getInputCount() const override;
 };
 

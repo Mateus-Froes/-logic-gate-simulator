@@ -11,7 +11,7 @@
 #include "../../include/gui/GuiApplication.h"
 #endif
 
-/** Ponto de entrada da aplicação gráfica do simulador. */
+// Ponto de entrada da versão com interface gráfica (SFML)
 int main(int argc, char* argv[]) {
     try {
         CircuitBoard board;

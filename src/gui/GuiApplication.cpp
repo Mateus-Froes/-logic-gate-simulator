@@ -24,20 +24,20 @@ const sf::Color COLOR_STATUS_TEXT(220, 225, 235);
 const sf::Color COLOR_HINT(130, 136, 150);
 const sf::Color COLOR_GHOST_WIRE(255, 220, 60);
 
-/** @brief Cria e retorna as configurações de contexto OpenGL com antialiasing ativado. */
+// Ativa o antialiasing pra deixar as linhas e bolinhas mais suaves
 sf::ContextSettings makeContextSettings() {
     sf::ContextSettings settings;
     settings.antiAliasingLevel = 4;
     return settings;
 }
 
-/** @brief Formata o rótulo textual de um componente no padrão "Nome#id". */
+// Monta uma string tipo "AND_2#1" pra identificar o componente nos avisos
 std::string describe(const Component& comp) {
     return comp.getName() + "#" + std::to_string(comp.getId());
 }
 }
 
-/** @brief Carrega e retorna a fonte tipográfica utilizada na interface gráfica. */
+// Tenta achar o arquivo da fonte em várias pastas relativas diferentes
 sf::Font GuiApplication::loadFont() {
     const std::filesystem::path sourceDir = std::filesystem::path(__FILE__).parent_path();
     const std::filesystem::path candidates[] = {
@@ -62,7 +62,7 @@ sf::Font GuiApplication::loadFont() {
         "Execute o programa a partir da raiz do projeto.");
 }
 
-/** @brief Inicializa a janela gráfica e associa a placa de circuito ao controlador. */
+// Configura a janela principal, carrega a fonte e prepara a simulação
 GuiApplication::GuiApplication(CircuitBoard& circuit)
     : board(circuit),
       font(loadFont()),
@@ -82,7 +82,7 @@ GuiApplication::GuiApplication(CircuitBoard& circuit)
     refreshSimulation();
 }
 
-/** @brief Executa o laço principal de eventos e renderização até a janela ser fechada. */
+// Mantém a janela aberta lendo eventos e desenhando a cada frame
 void GuiApplication::run() {
     while (window.isOpen()) {
         processEvents();
@@ -90,7 +90,7 @@ void GuiApplication::run() {
     }
 }
 
-/** @brief Renderiza um único quadro da interface e salva o resultado em um arquivo de imagem. */
+// Renderiza a tela uma vez e salva em PNG (útil pra tirar print automático)
 bool GuiApplication::saveSnapshot(const std::string& path) {
     processEvents();
     render();
@@ -99,7 +99,7 @@ bool GuiApplication::saveSnapshot(const std::string& path) {
     return texture.copyToImage().saveToFile(path);
 }
 
-/** @brief Processa todos os eventos pendentes da janela (teclado, mouse e redimensionamento). */
+// Lê a fila de eventos do SFML (fechar janela, resize, cliques e tecla ESC)
 void GuiApplication::processEvents() {
     while (const std::optional event = window.pollEvent()) {
         if (event->is<sf::Event::Closed>()) {
@@ -134,7 +134,7 @@ void GuiApplication::processEvents() {
     }
 }
 
-/** @brief Trata o clique com o botão esquerdo do mouse na barra lateral ou na área de desenho. */
+// Trata o clique esquerdo: botões da barra lateral, puxar fios ou arrastar portas
 void GuiApplication::onMousePressed(sf::Vector2f point) {
     if (sidebar.contains(point)) {
         if (mode == Mode::Wiring) {
@@ -191,7 +191,7 @@ void GuiApplication::onMousePressed(sf::Vector2f point) {
     }
 }
 
-/** @brief Trata o clique com o botão direito do mouse para cancelar conexões ou excluir elementos. */
+// Clique direito serve tanto pra cancelar um fio quanto pra apagar coisas rápido
 void GuiApplication::onRightMousePressed(sf::Vector2f point) {
     if (mode == Mode::Wiring) {
         cancelWiring("Ligação cancelada.");
@@ -204,7 +204,7 @@ void GuiApplication::onRightMousePressed(sf::Vector2f point) {
     }
 }
 
-/** @brief Remove o pino conectado, componente ou fio localizado sob o ponto informado. */
+// Tenta apagar o que estiver debaixo do mouse (primeiro pinos, depois componente, depois fio)
 bool GuiApplication::deleteAt(sf::Vector2f point) {
     for (size_t i = board.getComponentCount(); i-- > 0;) {
         Component* comp = board.getComponent(i);
@@ -259,7 +259,7 @@ bool GuiApplication::deleteAt(sf::Vector2f point) {
     return false;
 }
 
-/** @brief Atualiza a posição do cursor e move o componente selecionado durante um arrasto. */
+// Segue o movimento do mouse e arrasta o componente se passou do limite mínimo
 void GuiApplication::onMouseMoved(sf::Vector2f point) {
     mousePosition = point;
     if (mode != Mode::Dragging || dragTarget == nullptr) return;
@@ -276,7 +276,7 @@ void GuiApplication::onMouseMoved(sf::Vector2f point) {
     }
 }
 
-/** @brief Finaliza o arrasto de um componente ou alterna o estado de uma chave ao soltar o mouse. */
+// Soltou o mouse: se nem mexeu e era um switch, inverte o valor dele
 void GuiApplication::onMouseReleased() {
     if (mode != Mode::Dragging) return;
 
@@ -295,14 +295,14 @@ void GuiApplication::onMouseReleased() {
     dragTarget = nullptr;
 }
 
-/** @brief Cancela a criação de um fio em andamento e atualiza a mensagem da barra de status. */
+// Sai do modo de criação de fio e mostra a mensagem passada
 void GuiApplication::cancelWiring(const std::string& reason) {
     mode = Mode::Idle;
     wiringSource = nullptr;
     statusMessage = reason;
 }
 
-/** @brief Retorna o componente cujo corpo contém o ponto informado, ou nullptr se nenhum for atingido. */
+// Procura de trás pra frente qual componente contém o ponto clicado
 Component* GuiApplication::componentAt(sf::Vector2f point) const {
     for (size_t i = board.getComponentCount(); i-- > 0;) {
         Component* comp = board.getComponent(i);
@@ -311,7 +311,7 @@ Component* GuiApplication::componentAt(sf::Vector2f point) const {
     return nullptr;
 }
 
-/** @brief Procura e retorna uma posição livre na área de desenho para posicionar um novo componente. */
+// Varre a tela em grade procurando um lugar vazio pra não jogar um componente em cima do outro
 sf::Vector2f GuiApplication::findFreeSpot() const {
     const float padding = 20.0f;
     const float cellW = GuiRenderer::BODY_WIDTH + 50.0f;
@@ -338,7 +338,7 @@ sf::Vector2f GuiApplication::findFreeSpot() const {
     return {startX, startY};
 }
 
-/** @brief Cria uma porta lógica multi-entrada na placa utilizando o número de entradas selecionado na barra lateral. */
+// Template pra criar portas de 2 ou 3 entradas sem repetir código no switch
 template <typename GateType>
 void GuiApplication::spawnMultiInputGate() {
     const sf::Vector2f pos = findFreeSpot();
@@ -348,7 +348,7 @@ void GuiApplication::spawnMultiInputGate() {
     statusMessage = describe(*gate) + " criado.";
 }
 
-/** @brief Executa a ação correspondente ao botão clicado na barra lateral. */
+// Faz o que o botão da barra lateral pediu (adicionar porta, switch, LED, limpar, etc.)
 void GuiApplication::handleToolAction(ToolAction action) {
     const sf::Vector2f pos = findFreeSpot();
     const int id = board.nextFreeId();
@@ -399,7 +399,7 @@ void GuiApplication::handleToolAction(ToolAction action) {
     }
 }
 
-/** @brief Tenta conectar a saída de um componente à entrada de outro e atualiza a simulação. */
+// Valida e conecta dois componentes na placa, atualizando a mensagem lá embaixo
 void GuiApplication::tryConnect(Component& source, Component& destination, size_t pinIndex) {
     if (&source == &destination) {
         statusMessage = "Um componente não pode ser ligado a si mesmo.";
@@ -419,12 +419,12 @@ void GuiApplication::tryConnect(Component& source, Component& destination, size_
     }
 }
 
-/** @brief Recalcula os estados lógicos de todo o circuito. */
+// Roda um passo completo da simulação da placa
 void GuiApplication::refreshSimulation() {
     board.stepSimulation();
 }
 
-/** @brief Limpa a janela e desenha a grade, a placa, a barra lateral e a barra de status. */
+// Desenha tudo na janela: grade de fundo, circuito, fio fantasma e interface
 void GuiApplication::render() {
     window.clear(COLOR_BACKGROUND);
 
@@ -455,7 +455,7 @@ void GuiApplication::render() {
     window.display();
 }
 
-/** @brief Desenha as instruções de uso no topo e a barra de status no rodapé da janela. */
+// Desenha o texto de ajuda lá em cima e a barra de status no rodapé
 void GuiApplication::drawOverlay() {
     const sf::Vector2f area = window.getView().getSize();
 

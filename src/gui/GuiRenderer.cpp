@@ -25,13 +25,13 @@ const sf::Color COLOR_TEXT(240, 240, 245);
 const sf::Color COLOR_HOVER(255, 220, 60);
 const sf::Color COLOR_WIRE_HOVER(255, 110, 90);
 
-/** @brief Calcula a distância euclidiana entre dois pontos 2D. */
+// Calcula a distância entre dois pontos 2D
 float distance(sf::Vector2f a, sf::Vector2f b) {
     const sf::Vector2f d = b - a;
     return std::sqrt(d.x * d.x + d.y * d.y);
 }
 
-/** @brief Calcula a menor distância entre um ponto e um segmento de reta. */
+// Menor distância de um ponto até um segmento de reta (usado pra clicar no fio)
 float pointToSegmentDistance(sf::Vector2f p, sf::Vector2f a, sf::Vector2f b) {
     const sf::Vector2f ab = b - a;
     const float lenSq = ab.x * ab.x + ab.y * ab.y;
@@ -44,38 +44,38 @@ float pointToSegmentDistance(sf::Vector2f p, sf::Vector2f a, sf::Vector2f b) {
 }
 }
 
-/** @brief Converte uma string codificada em UTF-8 para sf::String. */
+// Converte string UTF-8 pra sf::String não quebrar os acentos
 sf::String toSfString(const std::string& utf8) {
     return sf::String::fromUtf8(utf8.begin(), utf8.end());
 }
 
-/** @brief Inicializa o renderizador associando a fonte utilizada nos textos. */
+// Inicializa o renderizador guardando a fonte
 GuiRenderer::GuiRenderer(const sf::Font& fontRef) : font(fontRef) {}
 
-/** @brief Retorna o retângulo delimitador do corpo de um componente. */
+// Retorna a caixa (retângulo) onde fica o corpo do componente
 sf::FloatRect GuiRenderer::bodyRect(const Component& comp) {
     return sf::FloatRect({comp.getX(), comp.getY()}, {BODY_WIDTH, BODY_HEIGHT});
 }
 
-/** @brief Calcula e retorna a posição central do pino de saída de um componente. */
+// Posição do pino de saída (no meio do lado direito)
 sf::Vector2f GuiRenderer::outputPinPos(const Component& comp) {
     return {comp.getX() + BODY_WIDTH, comp.getY() + BODY_HEIGHT / 2.0f};
 }
 
-/** @brief Calcula e retorna a posição central de um pino de entrada pelo seu índice. */
+// Posição de cada pino de entrada (distribuídos no lado esquerdo)
 sf::Vector2f GuiRenderer::inputPinPos(const Component& comp, size_t index) {
     const float count = static_cast<float>(comp.getInputCount());
     const float step = BODY_HEIGHT / (count + 1.0f);
     return {comp.getX(), comp.getY() + step * static_cast<float>(index + 1)};
 }
 
-/** @brief Verifica se o ponto informado está sobre o pino de saída do componente. */
+// Vê se o ponto está dentro do raio do pino de saída
 bool GuiRenderer::hitOutputPin(Component& comp, sf::Vector2f point) {
     return comp.getOutputPin() != nullptr &&
            distance(point, outputPinPos(comp)) <= PIN_HIT_RADIUS;
 }
 
-/** @brief Retorna o índice do pino de entrada sob o ponto informado, ou -1 se nenhum for atingido. */
+// Testa se o ponto bateu em algum pino de entrada e retorna qual foi (ou -1)
 int GuiRenderer::hitInputPin(const Component& comp, sf::Vector2f point) {
     for (size_t i = 0; i < comp.getInputCount(); ++i) {
         if (distance(point, inputPinPos(comp, i)) <= PIN_HIT_RADIUS) {
@@ -85,7 +85,7 @@ int GuiRenderer::hitInputPin(const Component& comp, sf::Vector2f point) {
     return -1;
 }
 
-/** @brief Calcula e retorna os vértices da polilinha ortogonal que compõe o traçado de um fio. */
+// Cria os pontos do caminho dobrado em 90 graus pro fio ligar dois pinos
 std::vector<sf::Vector2f> GuiRenderer::wirePolyline(sf::Vector2f from, sf::Vector2f to, int lane) {
     const float margin = 18.0f;
     if (to.x < from.x + 2.0f * margin) {
@@ -103,7 +103,7 @@ std::vector<sf::Vector2f> GuiRenderer::wirePolyline(sf::Vector2f from, sf::Vecto
     return {from, {midX, from.y}, {midX, to.y}, to};
 }
 
-/** @brief Retorna o índice do fio cujo traçado passa sob o ponto informado, ou -1 se nenhum for atingido. */
+// Checa se o mouse está perto o suficiente de algum trecho de fio
 int GuiRenderer::hitWire(const CircuitBoard& board, sf::Vector2f point) {
     constexpr float HIT_TOLERANCE = 6.5f;
     for (size_t i = board.getWireCount(); i-- > 0;) {
@@ -124,7 +124,7 @@ int GuiRenderer::hitWire(const CircuitBoard& board, sf::Vector2f point) {
     return -1;
 }
 
-/** @brief Desenha um segmento de reta espesso entre dois pontos. */
+// Desenha uma linha grossa entre os pontos A e B
 void GuiRenderer::drawSegment(sf::RenderTarget& target, sf::Vector2f a, sf::Vector2f b,
                               sf::Color color) const {
     const sf::Vector2f d = b - a;
@@ -145,7 +145,7 @@ void GuiRenderer::drawSegment(sf::RenderTarget& target, sf::Vector2f a, sf::Vect
     target.draw(joint);
 }
 
-/** @brief Desenha um fio ortogonal entre dois pontos com a cor especificada. */
+// Desenha o fio completo ligando todos os segmentos dele
 void GuiRenderer::drawWire(sf::RenderTarget& target, sf::Vector2f from, sf::Vector2f to,
                            sf::Color color, int lane) const {
     const auto pts = wirePolyline(from, to, lane);
@@ -154,7 +154,7 @@ void GuiRenderer::drawWire(sf::RenderTarget& target, sf::Vector2f from, sf::Vect
     }
 }
 
-/** @brief Desenha um texto alinhado pelo canto superior esquerdo na posição informada. */
+// Desenha um texto na posição (x, y) normal
 void GuiRenderer::drawText(sf::RenderTarget& target, const std::string& text,
                            sf::Vector2f topLeft, unsigned int size, sf::Color color) const {
     sf::Text label(font, toSfString(text), size);
@@ -163,7 +163,7 @@ void GuiRenderer::drawText(sf::RenderTarget& target, const std::string& text,
     target.draw(label);
 }
 
-/** @brief Desenha um texto centralizado na posição informada. */
+// Desenha um texto centralizado no ponto informado
 void GuiRenderer::drawCenteredText(sf::RenderTarget& target, const std::string& text,
                                    sf::Vector2f center, unsigned int size, sf::Color color) const {
     sf::Text label(font, toSfString(text), size);
@@ -175,7 +175,7 @@ void GuiRenderer::drawCenteredText(sf::RenderTarget& target, const std::string& 
     target.draw(label);
 }
 
-/** @brief Desenha um pino circular indicando seu estado lógico e destaque de cursor. */
+// Desenha o círculo de um pino (aumenta um pouco se o mouse estiver em cima)
 void GuiRenderer::drawPin(sf::RenderTarget& target, sf::Vector2f center, bool state,
                           bool hovered) const {
     const float radius = hovered ? PIN_RADIUS + 2.0f : PIN_RADIUS;
@@ -188,7 +188,7 @@ void GuiRenderer::drawPin(sf::RenderTarget& target, sf::Vector2f center, bool st
     target.draw(pin);
 }
 
-/** @brief Desenha o corpo, os rótulos e os pinos de um único componente. */
+// Desenha o componente inteiro (corpo, textos, LED/chave e pinos)
 void GuiRenderer::drawComponent(sf::RenderTarget& target, Component& comp,
                                 sf::Vector2f mouse) const {
     const sf::FloatRect rect = bodyRect(comp);
@@ -246,7 +246,7 @@ void GuiRenderer::drawComponent(sf::RenderTarget& target, Component& comp,
     }
 }
 
-/** @brief Desenha todos os fios e componentes da placa no alvo de renderização. */
+// Desenha todos os fios primeiro e depois os componentes por cima
 void GuiRenderer::drawBoard(sf::RenderTarget& target, const CircuitBoard& board,
                             sf::Vector2f mouse) const {
     const int hoveredWire = hitWire(board, mouse);

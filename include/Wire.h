@@ -14,31 +14,31 @@ private:
     Pin<bool>* destPin;
 
 public:
-    /** @brief Constrói um fio conectando o pino de saída de origem ao pino de entrada de destino. */
+    // Cria um fio ligando o pino de saída de um componente na entrada de outro
     Wire(int srcId, Pin<bool>* src, int dstId, Pin<bool>* dst, size_t dstIdx);
 
-    /** @brief Copia o estado lógico do pino de origem para o pino de destino. */
+    // Passa o sinal do pino de origem pro pino de destino
     void propagate();
 
-    /** @brief Zera o estado e marca como desconectado o pino de entrada de destino. */
+    // Zera a entrada de destino e marca que não tem mais fio conectado nela
     void disconnectInputPin();
 
-    /** @brief Religa os ponteiros de pino do fio aos componentes informados. */
+    // Atualiza os ponteiros dos pinos (útil depois de clonar a placa)
     void rebind(Component* srcComp, Component* dstComp);
 
-    /** @brief Retorna o ID do componente de origem. */
+    // Pega o ID do componente de onde o fio sai
     int getSourceId() const;
 
-    /** @brief Retorna o ID do componente de destino. */
+    // Pega o ID do componente onde o fio chega
     int getDestId() const;
 
-    /** @brief Retorna o índice do pino de entrada no componente de destino. */
+    // Qual pino de entrada do destino esse fio está ligado
     size_t getDestPinIndex() const;
 
-    /** @brief Retorna o estado lógico atual transportado pelo fio. */
+    // Retorna o sinal (0 ou 1) que está passando pelo fio
     bool getWireState() const;
 
-    /** @brief Compara se dois fios conectam ao mesmo pino de entrada do mesmo componente de destino. */
+    // Dois fios são considerados iguais se vão para a mesma entrada do mesmo componente
     bool operator==(const Wire& other) const;
 };
 

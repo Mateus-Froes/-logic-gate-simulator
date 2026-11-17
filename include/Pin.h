@@ -8,27 +8,27 @@ private:
     bool connected;
 
 public:
-    /** @brief Constrói o pino com um estado inicial e desconectado. */
+    // Começa o pino desconectado e com o estado inicial passado
     explicit Pin(T initialState = T()) : state(initialState), connected(false) {}
 
-    /** @brief Define o valor atual do sinal no pino. */
+    // Muda o valor do sinal no pino
     void setState(T newState) { state = newState; }
 
-    /** @brief Retorna o valor atual do sinal no pino. */
+    // Pega o valor atual do sinal
     T getState() const { return state; }
 
-    /** @brief Define se o pino está conectado a um fio. */
+    // Marca se o pino está conectado a algum fio ou não
     void setConnected(bool status) { connected = status; }
 
-    /** @brief Retorna true se o pino estiver conectado a um fio. */
+    // Diz se tem fio ligado nesse pino
     bool isConnected() const { return connected; }
 
-    /** @brief Verifica se dois pinos possuem o mesmo estado e status de conexão. */
+    // Compara se dois pinos têm o mesmo estado e conexão
     bool operator==(const Pin<T>& other) const {
         return (state == other.state) && (connected == other.connected);
     }
 
-    /** @brief Verifica se dois pinos diferem em estado ou status de conexão. */
+    // Compara se dois pinos são diferentes
     bool operator!=(const Pin<T>& other) const {
         return !(*this == other);
     }

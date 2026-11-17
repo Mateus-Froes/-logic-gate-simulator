@@ -13,16 +13,16 @@
 
 class GuiApplication {
 public:
-    /** @brief Inicializa a janela gráfica e associa a placa de circuito ao controlador. */
+    // Cria a janela do SFML e conecta com a placa do circuito
     explicit GuiApplication(CircuitBoard& circuit);
 
     GuiApplication(const GuiApplication&) = delete;
     GuiApplication& operator=(const GuiApplication&) = delete;
 
-    /** @brief Executa o laço principal de eventos e renderização até a janela ser fechada. */
+    // Loop principal: lê os eventos e desenha tudo até fechar a janela
     void run();
 
-    /** @brief Renderiza um único quadro da interface e salva o resultado em um arquivo de imagem. */
+    // Desenha um frame e salva como imagem (usado na flag --snapshot)
     bool saveSnapshot(const std::string& path);
 
 private:
@@ -50,53 +50,53 @@ private:
     sf::Vector2f mousePosition;
     std::string statusMessage;
 
-    /** @brief Carrega e retorna a fonte tipográfica utilizada na interface gráfica. */
+    // Procura e carrega a fonte usada na interface
     static sf::Font loadFont();
 
-    /** @brief Processa todos os eventos pendentes da janela (teclado, mouse e redimensionamento). */
+    // Processa os eventos da janela (mouse, teclado, fechar, redimensionar)
     void processEvents();
 
-    /** @brief Trata o clique com o botão esquerdo do mouse na barra lateral ou na área de desenho. */
+    // Clique esquerdo: interage com a barra lateral ou com os componentes na tela
     void onMousePressed(sf::Vector2f point);
 
-    /** @brief Trata o clique com o botão direito do mouse para cancelar conexões ou excluir elementos. */
+    // Clique direito: cancela o fio atual ou apaga componentes/conexões
     void onRightMousePressed(sf::Vector2f point);
 
-    /** @brief Finaliza o arrasto de um componente ou alterna o estado de uma chave ao soltar o mouse. */
+    // Quando solta o botão do mouse: finaliza o arrasto ou alterna um switch
     void onMouseReleased();
 
-    /** @brief Atualiza a posição do cursor e move o componente selecionado durante um arrasto. */
+    // Atualiza a posição do mouse e move o componente se estiver arrastando
     void onMouseMoved(sf::Vector2f point);
 
-    /** @brief Cancela a criação de um fio em andamento e atualiza a mensagem da barra de status. */
+    // Cancela o fio que estava sendo puxado e mostra o motivo na barra de status
     void cancelWiring(const std::string& reason);
 
-    /** @brief Executa a ação correspondente ao botão clicado na barra lateral. */
+    // Executa a ação do botão clicado na barra lateral
     void handleToolAction(ToolAction action);
 
-    /** @brief Tenta conectar a saída de um componente à entrada de outro e atualiza a simulação. */
+    // Tenta ligar a saída de um componente na entrada de outro
     void tryConnect(Component& source, Component& destination, size_t pinIndex);
 
-    /** @brief Remove o pino conectado, componente ou fio localizado sob o ponto informado. */
+    // Apaga o pino conectado, componente ou fio que estiver na posição clicada
     bool deleteAt(sf::Vector2f point);
 
-    /** @brief Retorna o componente cujo corpo contém o ponto informado, ou nullptr se nenhum for atingido. */
+    // Retorna qual componente está debaixo do ponto passado (ou nullptr)
     Component* componentAt(sf::Vector2f point) const;
 
-    /** @brief Procura e retorna uma posição livre na área de desenho para posicionar um novo componente. */
+    // Acha um lugar livre na área de desenho pra colocar um componente novo
     sf::Vector2f findFreeSpot() const;
 
-    /** @brief Cria uma porta lógica multi-entrada na placa utilizando o número de entradas selecionado na barra lateral. */
+    // Cria uma porta de várias entradas usando a quantidade marcada na barra lateral
     template <typename GateType>
     void spawnMultiInputGate();
 
-    /** @brief Recalcula os estados lógicos de todo o circuito. */
+    // Roda a simulação pra atualizar os estados do circuito
     void refreshSimulation();
 
-    /** @brief Limpa a janela e desenha a grade, a placa, a barra lateral e a barra de status. */
+    // Limpa a janela e desenha a grade, o circuito, a barra lateral e os avisos
     void render();
 
-    /** @brief Desenha as instruções de uso no topo e a barra de status no rodapé da janela. */
+    // Desenha as dicas no topo e a barra de status no rodapé
     void drawOverlay();
 };
 
