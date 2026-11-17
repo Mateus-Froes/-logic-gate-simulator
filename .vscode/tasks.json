@@ -2,47 +2,19 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Build Core (Terminal)",
-            "type": "shell",
-            "command": "g++",
+            "type": "cppbuild",
+            "label": "C/C++: g++.exe build active file",
+            "command": "C:/msys2/ucrt64/bin/g++.exe",
             "args": [
+                "-fdiagnostics-color=always",
                 "-std=c++17",
+                "-g",
                 "-Wall",
                 "-Wextra",
-                "-Iinclude",
-                "src/Component.cpp",
-                "src/Wire.cpp",
-                "src/Gates.cpp",
-                "src/CircuitBoard.cpp",
-                "src/main.cpp",
+                "-I${workspaceFolder}/include",
+                "${file}",
                 "-o",
-                "build/simulador.exe"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": ["$gcc"],
-            "group": "build"
-        },
-        {
-            "label": "Build GUI (SFML 3)",
-            "type": "shell",
-            "command": "g++",
-            "args": [
-                "-std=c++17",
-                "-Wall",
-                "-Wextra",
-                "-Iinclude",
-                "src/Component.cpp",
-                "src/Wire.cpp",
-                "src/Gates.cpp",
-                "src/CircuitBoard.cpp",
-                "src/gui/GuiRenderer.cpp",
-                "src/gui/Sidebar.cpp",
-                "src/gui/GuiApplication.cpp",
-                "src/gui/main_gui.cpp",
-                "-o",
-                "build/simulador_gui.exe",
+                "${workspaceFolder}/build/${fileBasenameNoExtension}.exe",
                 "-lsfml-graphics",
                 "-lsfml-window",
                 "-lsfml-system"
@@ -50,11 +22,76 @@
             "options": {
                 "cwd": "${workspaceFolder}"
             },
-            "problemMatcher": ["$gcc"],
+            "problemMatcher": [
+                "$gcc"
+            ],
             "group": {
                 "kind": "build",
                 "isDefault": true
-            }
+            },
+            "detail": "Compila o arquivo ativo (GUI ou Terminal) pelo botão Play do VS Code"
+        },
+        {
+            "type": "cppbuild",
+            "label": "Build GUI (SFML 3)",
+            "command": "C:/msys2/ucrt64/bin/g++.exe",
+            "args": [
+                "-fdiagnostics-color=always",
+                "-std=c++17",
+                "-g",
+                "-Wall",
+                "-Wextra",
+                "-DMULTI_FILE_BUILD",
+                "-I${workspaceFolder}/include",
+                "${workspaceFolder}/src/Component.cpp",
+                "${workspaceFolder}/src/Wire.cpp",
+                "${workspaceFolder}/src/Gates.cpp",
+                "${workspaceFolder}/src/CircuitBoard.cpp",
+                "${workspaceFolder}/src/gui/GuiRenderer.cpp",
+                "${workspaceFolder}/src/gui/Sidebar.cpp",
+                "${workspaceFolder}/src/gui/GuiApplication.cpp",
+                "${workspaceFolder}/src/gui/main_gui.cpp",
+                "-o",
+                "${workspaceFolder}/build/simulador_gui.exe",
+                "-lsfml-graphics",
+                "-lsfml-window",
+                "-lsfml-system"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build"
+        },
+        {
+            "type": "cppbuild",
+            "label": "Build Core (Terminal)",
+            "command": "C:/msys2/ucrt64/bin/g++.exe",
+            "args": [
+                "-fdiagnostics-color=always",
+                "-std=c++17",
+                "-g",
+                "-Wall",
+                "-Wextra",
+                "-DMULTI_FILE_BUILD",
+                "-I${workspaceFolder}/include",
+                "${workspaceFolder}/src/Component.cpp",
+                "${workspaceFolder}/src/Wire.cpp",
+                "${workspaceFolder}/src/Gates.cpp",
+                "${workspaceFolder}/src/CircuitBoard.cpp",
+                "${workspaceFolder}/src/main.cpp",
+                "-o",
+                "${workspaceFolder}/build/simulador.exe"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build"
         }
     ]
 }

@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 #include <SFML/Graphics.hpp>
-#include "gui/GuiRenderer.h"
+#include "GuiRenderer.h"
 
 enum class ToolAction {
     None,

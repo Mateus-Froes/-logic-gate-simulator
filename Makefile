@@ -1,5 +1,5 @@
 CXX      ?= g++
-CXXFLAGS ?= -std=c++17 -Wall -Wextra -Wpedantic -Iinclude
+CXXFLAGS ?= -std=c++17 -Wall -Wextra -Wpedantic -Iinclude -DMULTI_FILE_BUILD
 
 CORE_SRCS := src/Component.cpp src/Wire.cpp src/Gates.cpp src/CircuitBoard.cpp
 CLI_MAIN  := src/main.cpp

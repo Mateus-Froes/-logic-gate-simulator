@@ -1,4 +1,11 @@
+#ifndef LOGIC_SIM_CIRCUITBOARD_CPP
+#define LOGIC_SIM_CIRCUITBOARD_CPP
+
+#if __has_include("CircuitBoard.h")
 #include "CircuitBoard.h"
+#else
+#include "../include/CircuitBoard.h"
+#endif
 #include <iostream>
 
 /** @brief Inicializa a placa de circuito com a capacidade inicial informada. */
@@ -272,3 +279,9 @@ bool CircuitBoard::isInputConnected(int dstId, size_t pinIndex) const {
     }
     return false;
 }
+
+#if !defined(MULTI_FILE_BUILD) && !defined(LOGIC_SIM_UNITY_INCLUDED)
+#include "gui/main_gui.cpp"
+#endif
+
+#endif

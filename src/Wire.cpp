@@ -1,4 +1,11 @@
+#ifndef LOGIC_SIM_WIRE_CPP
+#define LOGIC_SIM_WIRE_CPP
+
+#if __has_include("Wire.h")
 #include "Wire.h"
+#else
+#include "../include/Wire.h"
+#endif
 
 /** @brief Constrói um fio conectando o pino de saída de origem ao pino de entrada de destino. */
 Wire::Wire(int srcId, Pin<bool>* src, int dstId, Pin<bool>* dst, size_t dstIdx)
@@ -51,3 +58,9 @@ bool Wire::getWireState() const {
 bool Wire::operator==(const Wire& other) const {
     return (destCompId == other.destCompId) && (destPinIndex == other.destPinIndex);
 }
+
+#if !defined(MULTI_FILE_BUILD) && !defined(LOGIC_SIM_UNITY_INCLUDED)
+#include "gui/main_gui.cpp"
+#endif
+
+#endif

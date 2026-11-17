@@ -1,5 +1,7 @@
-build/
-src/output/
+build/*
+!build/.gitkeep
+output/
+**/output/
 *.exe
 *.o
 *.obj

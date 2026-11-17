@@ -1,0 +1,21 @@
+{
+    "c-cpp-compile-run.cpp-compiler": "g++",
+    "c-cpp-compile-run.cpp-flags": "-std=c++17 -Wall -Wextra -g3",
+    "c-cpp-compile-run.cpp-linker-flags": "-lsfml-graphics -lsfml-window -lsfml-system",
+    "c-cpp-compile-run.additional-include-paths": [
+        "${workspaceFolder}/include"
+    ],
+    "c-cpp-compile-run.output-location": "${workspaceFolder}/build",
+    "c-cpp-compile-run.skip-if-compiled": false,
+    "code-runner.runInTerminal": true,
+    "code-runner.saveFileBeforeRun": true,
+    "code-runner.executorMap": {
+        "cpp": "cd $dir && g++ -std=c++17 -Wall -Wextra \"$fileName\" -o \"$workspaceRoot/build/$fileNameWithoutExt.exe\" -lsfml-graphics -lsfml-window -lsfml-system && \"$workspaceRoot/build/$fileNameWithoutExt.exe\""
+    },
+    "C_Cpp.default.cppStandard": "c++17",
+    "C_Cpp.default.compilerPath": "C:/msys2/ucrt64/bin/g++.exe",
+    "C_Cpp.default.includePath": [
+        "${workspaceFolder}/include",
+        "${workspaceFolder}/**"
+    ]
+}

@@ -5,8 +5,13 @@
 #include <string>
 #include <vector>
 #include <SFML/Graphics.hpp>
+#if __has_include("CircuitBoard.h")
 #include "CircuitBoard.h"
 #include "Component.h"
+#else
+#include "../CircuitBoard.h"
+#include "../Component.h"
+#endif
 
 /** @brief Converte uma string codificada em UTF-8 para sf::String. */
 sf::String toSfString(const std::string& utf8);

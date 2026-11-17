@@ -1,11 +1,20 @@
+#ifndef LOGIC_SIM_GUIAPPLICATION_CPP
+#define LOGIC_SIM_GUIAPPLICATION_CPP
+
+#if __has_include("gui/GuiApplication.h")
 #include "gui/GuiApplication.h"
+#include "Gates.h"
+#else
+#include "../../include/gui/GuiApplication.h"
+#include "../../include/Gates.h"
+#endif
 
 #include <algorithm>
 #include <cmath>
+#include <filesystem>
 #include <optional>
 #include <stdexcept>
 #include <utility>
-#include "Gates.h"
 
 namespace {
 const sf::Color COLOR_BACKGROUND(18, 20, 26);
@@ -30,14 +39,21 @@ std::string describe(const Component& comp) {
 
 /** @brief Carrega e retorna a fonte tipográfica utilizada na interface gráfica. */
 sf::Font GuiApplication::loadFont() {
-    const char* candidates[] = {
+    const std::filesystem::path sourceDir = std::filesystem::path(__FILE__).parent_path();
+    const std::filesystem::path candidates[] = {
         "assets/fonts/DejaVuSans.ttf",
         "../assets/fonts/DejaVuSans.ttf",
         "../../assets/fonts/DejaVuSans.ttf",
+        "../../../assets/fonts/DejaVuSans.ttf",
+        "../../../../assets/fonts/DejaVuSans.ttf",
+        "LOGIC GATE SIMULATOR/assets/fonts/DejaVuSans.ttf",
+        "../LOGIC GATE SIMULATOR/assets/fonts/DejaVuSans.ttf",
+        sourceDir / "../../assets/fonts/DejaVuSans.ttf",
     };
     sf::Font loaded;
-    for (const char* path : candidates) {
-        if (loaded.openFromFile(path)) {
+    std::error_code ec;
+    for (const auto& path : candidates) {
+        if (std::filesystem::exists(path, ec) && loaded.openFromFile(path)) {
             return loaded;
         }
     }
@@ -457,3 +473,9 @@ void GuiApplication::drawOverlay() {
     renderer.drawText(window, counts + statusMessage, {12.0f, area.y - STATUS_BAR_HEIGHT + 6.0f},
                       14, COLOR_STATUS_TEXT);
 }
+
+#if !defined(MULTI_FILE_BUILD) && !defined(LOGIC_SIM_UNITY_INCLUDED)
+#include "main_gui.cpp"
+#endif
+
+#endif

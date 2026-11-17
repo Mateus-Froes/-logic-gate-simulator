@@ -1,6 +1,13 @@
+#define LOGIC_SIM_UNITY_INCLUDED
+
 #include <iostream>
+#if __has_include("CircuitBoard.h")
 #include "CircuitBoard.h"
 #include "Gates.h"
+#else
+#include "../include/CircuitBoard.h"
+#include "../include/Gates.h"
+#endif
 
 /** @brief Ponto de entrada da versão de terminal para simulação e teste de cópia do circuito. */
 int main() {
@@ -55,3 +62,10 @@ int main() {
 
     return 0;
 }
+
+#ifndef MULTI_FILE_BUILD
+#include "Component.cpp"
+#include "Wire.cpp"
+#include "Gates.cpp"
+#include "CircuitBoard.cpp"
+#endif

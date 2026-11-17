@@ -1,4 +1,11 @@
+#ifndef LOGIC_SIM_SIDEBAR_CPP
+#define LOGIC_SIM_SIDEBAR_CPP
+
+#if __has_include("gui/Sidebar.h")
 #include "gui/Sidebar.h"
+#else
+#include "../../include/gui/Sidebar.h"
+#endif
 
 namespace {
 const sf::Color COLOR_PANEL(28, 30, 36);
@@ -7,7 +14,7 @@ const sf::Color COLOR_BUTTON_HOVER(72, 78, 92);
 const sf::Color COLOR_BUTTON_SELECTED(40, 110, 200);
 const sf::Color COLOR_BUTTON_DANGER(185, 55, 55);
 const sf::Color COLOR_BORDER(90, 95, 110);
-const sf::Color COLOR_TEXT(235, 235, 240);
+const sf::Color COLOR_SIDEBAR_TEXT(235, 235, 240);
 const sf::Color COLOR_TITLE(150, 190, 255);
 }
 
@@ -119,6 +126,12 @@ void Sidebar::draw(sf::RenderTarget& target, const GuiRenderer& renderer,
         shape.setOutlineColor(COLOR_BORDER);
         target.draw(shape);
 
-        renderer.drawCenteredText(target, button.label, button.area.getCenter(), 15, COLOR_TEXT);
+        renderer.drawCenteredText(target, button.label, button.area.getCenter(), 15, COLOR_SIDEBAR_TEXT);
     }
 }
+
+#if !defined(MULTI_FILE_BUILD) && !defined(LOGIC_SIM_UNITY_INCLUDED)
+#include "main_gui.cpp"
+#endif
+
+#endif

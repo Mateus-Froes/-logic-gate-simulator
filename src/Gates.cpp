@@ -1,4 +1,11 @@
+#ifndef LOGIC_SIM_GATES_CPP
+#define LOGIC_SIM_GATES_CPP
+
+#if __has_include("Gates.h")
 #include "Gates.h"
+#else
+#include "../include/Gates.h"
+#endif
 
 /** @brief Constrói uma porta lógica básica com um pino de saída inicializado em falso. */
 LogicGate::LogicGate(int compId, const std::string& compName, float x, float y)
@@ -165,3 +172,9 @@ Pin<bool>* OutputLED::getInputPin(size_t index) { return (index == 0) ? &inputPi
 
 /** @brief Retorna 1, indicando que o LED possui apenas uma entrada. */
 size_t OutputLED::getInputCount() const { return 1; }
+
+#if !defined(MULTI_FILE_BUILD) && !defined(LOGIC_SIM_UNITY_INCLUDED)
+#include "gui/main_gui.cpp"
+#endif
+
+#endif

@@ -3,9 +3,13 @@
 
 #include <string>
 #include <SFML/Graphics.hpp>
+#if __has_include("CircuitBoard.h")
 #include "CircuitBoard.h"
-#include "gui/GuiRenderer.h"
-#include "gui/Sidebar.h"
+#else
+#include "../CircuitBoard.h"
+#endif
+#include "GuiRenderer.h"
+#include "Sidebar.h"
 
 class GuiApplication {
 public:

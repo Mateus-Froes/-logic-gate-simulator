@@ -1,7 +1,15 @@
+#ifndef LOGIC_SIM_GUIRENDERER_CPP
+#define LOGIC_SIM_GUIRENDERER_CPP
+
+#if __has_include("gui/GuiRenderer.h")
 #include "gui/GuiRenderer.h"
+#include "Gates.h"
+#else
+#include "../../include/gui/GuiRenderer.h"
+#include "../../include/Gates.h"
+#endif
 
 #include <cmath>
-#include "Gates.h"
 
 namespace {
 const sf::Color COLOR_WIRE_ON(60, 220, 90);
@@ -261,3 +269,9 @@ void GuiRenderer::drawBoard(sf::RenderTarget& target, const CircuitBoard& board,
         drawComponent(target, *board.getComponent(i), mouse);
     }
 }
+
+#if !defined(MULTI_FILE_BUILD) && !defined(LOGIC_SIM_UNITY_INCLUDED)
+#include "main_gui.cpp"
+#endif
+
+#endif

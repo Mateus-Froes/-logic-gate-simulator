@@ -1,4 +1,11 @@
+#ifndef LOGIC_SIM_COMPONENT_CPP
+#define LOGIC_SIM_COMPONENT_CPP
+
+#if __has_include("Component.h")
 #include "Component.h"
+#else
+#include "../include/Component.h"
+#endif
 
 /** @brief Inicializa um componente com identificador, nome e coordenadas na placa. */
 Component::Component(int compId, const std::string& compName, float x, float y)
@@ -42,3 +49,9 @@ std::ostream& operator<<(std::ostream& os, const Component& comp) {
     }
     return os;
 }
+
+#if !defined(MULTI_FILE_BUILD) && !defined(LOGIC_SIM_UNITY_INCLUDED)
+#include "gui/main_gui.cpp"
+#endif
+
+#endif
