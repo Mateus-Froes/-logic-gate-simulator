@@ -8,55 +8,55 @@
 #endif
 
 // Cria o fio e já marca os pinos de origem e destino como conectados
-Wire::Wire(int srcId, Pin<bool>* src, int dstId, Pin<bool>* dst, size_t dstIdx)
-    : sourceCompId(srcId), destCompId(dstId), destPinIndex(dstIdx),
-      sourcePin(src), destPin(dst) {
-    if (sourcePin) sourcePin->setConnected(true);
-    if (destPin) destPin->setConnected(true);
+Fio::Fio(int srcId, Pino<bool>* src, int dstId, Pino<bool>* dst, size_t dstIdx)
+    : idOrigem(srcId), idDestino(dstId), indicePinoDestino(dstIdx),
+      pinoOrigem(src), pinoDestino(dst) {
+    if (pinoOrigem) pinoOrigem->setConnected(true);
+    if (pinoDestino) pinoDestino->setConnected(true);
 }
 
 // Copia o sinal da saída de origem para a entrada de destino
-void Wire::propagate() {
-    if (sourcePin && destPin) {
-        destPin->setState(sourcePin->getState());
+void Fio::propagate() {
+    if (pinoOrigem && pinoDestino) {
+        pinoDestino->setState(pinoOrigem->getState());
     }
 }
 
 // Solta o pino de entrada e volta o estado dele pra false
-void Wire::disconnectInputPin() {
-    if (destPin) {
-        destPin->setState(false);
-        destPin->setConnected(false);
+void Fio::disconnectInputPin() {
+    if (pinoDestino) {
+        pinoDestino->setState(false);
+        pinoDestino->setConnected(false);
     }
 }
 
 // Religa os ponteiros pros pinos dos novos componentes
-void Wire::rebind(Component* srcComp, Component* dstComp) {
+void Fio::rebind(Componente* srcComp, Componente* dstComp) {
     if (srcComp && dstComp) {
-        sourcePin = srcComp->getOutputPin();
-        destPin = dstComp->getInputPin(destPinIndex);
-        if (sourcePin) sourcePin->setConnected(true);
-        if (destPin) destPin->setConnected(true);
+        pinoOrigem = srcComp->getOutputPin();
+        pinoDestino = dstComp->getInputPin(indicePinoDestino);
+        if (pinoOrigem) pinoOrigem->setConnected(true);
+        if (pinoDestino) pinoDestino->setConnected(true);
     }
 }
 
 // Retorna o ID do componente de origem
-int Wire::getSourceId() const { return sourceCompId; }
+int Fio::getSourceId() const { return idOrigem; }
 
 // Retorna o ID do componente de destino
-int Wire::getDestId() const { return destCompId; }
+int Fio::getDestId() const { return idDestino; }
 
 // Retorna o índice do pino de entrada no destino
-size_t Wire::getDestPinIndex() const { return destPinIndex; }
+size_t Fio::getDestPinIndex() const { return indicePinoDestino; }
 
 // Vê qual valor lógico está passando no fio agora
-bool Wire::getWireState() const {
-    return sourcePin ? sourcePin->getState() : false;
+bool Fio::getWireState() const {
+    return pinoOrigem ? pinoOrigem->getState() : false;
 }
 
 // Checa se os dois fios ocupam exatamente a mesma entrada
-bool Wire::operator==(const Wire& other) const {
-    return (destCompId == other.destCompId) && (destPinIndex == other.destPinIndex);
+bool Fio::operator==(const Fio& outro) const {
+    return (idDestino == outro.idDestino) && (indicePinoDestino == outro.indicePinoDestino);
 }
 
 #if !defined(MULTI_FILE_BUILD) && !defined(LOGIC_SIM_UNITY_INCLUDED)

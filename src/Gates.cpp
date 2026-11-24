@@ -8,170 +8,170 @@
 #endif
 
 // Porta lógica básica, começa com a saída desligada
-LogicGate::LogicGate(int compId, const std::string& compName, float x, float y)
-    : Component(compId, compName, x, y), outputPin(false) {}
+PortaLogica::PortaLogica(int compId, const std::string& compNome, float x, float y)
+    : Componente(compId, compNome, x, y), pinoSaida(false) {}
 
 // Retorna o endereço do pino de saída
-Pin<bool>* LogicGate::getOutputPin() { return &outputPin; }
+Pino<bool>* PortaLogica::getOutputPin() { return &pinoSaida; }
 
 // Porta de uma entrada só, começa em false
-UnaryGate::UnaryGate(int compId, const std::string& compName, float x, float y)
-    : LogicGate(compId, compName, x, y), inputPin(false) {}
+PortaSimples::PortaSimples(int compId, const std::string& compNome, float x, float y)
+    : PortaLogica(compId, compNome, x, y), pinoEntrada(false) {}
 
 // Só retorna o pino se pedir o índice 0
-Pin<bool>* UnaryGate::getInputPin(size_t index) {
-    return (index == 0) ? &inputPin : nullptr;
+Pino<bool>* PortaSimples::getInputPin(size_t index) {
+    return (index == 0) ? &pinoEntrada : nullptr;
 }
 
 // Porta unária tem sempre 1 entrada
-size_t UnaryGate::getInputCount() const { return 1; }
+size_t PortaSimples::getInputCount() const { return 1; }
 
 // Cria a porta de várias entradas e valida se tem 2 ou 3 pinos
-MultiInputGate::MultiInputGate(int compId, const std::string& compName, size_t numInputs, float x, float y)
-    : LogicGate(compId, compName, x, y) {
-    if (numInputs < 2 || numInputs > 3) {
+PortaMulti::PortaMulti(int compId, const std::string& compNome, size_t qtdEntradas, float x, float y)
+    : PortaLogica(compId, compNome, x, y) {
+    if (qtdEntradas < 2 || qtdEntradas > 3) {
         throw std::invalid_argument("Portas multi-entrada devem ter estritamente 2 ou 3 pinos.");
     }
-    inputPins.resize(numInputs, Pin<bool>(false));
+    pinosEntrada.resize(qtdEntradas, Pino<bool>(false));
 }
 
 // Retorna o pino de entrada pedido ou nullptr se passar do limite
-Pin<bool>* MultiInputGate::getInputPin(size_t index) {
-    if (index >= inputPins.size()) return nullptr;
-    return &inputPins[index];
+Pino<bool>* PortaMulti::getInputPin(size_t index) {
+    if (index >= pinosEntrada.size()) return nullptr;
+    return &pinosEntrada[index];
 }
 
 // Quantidade de entradas configuradas
-size_t MultiInputGate::getNumInputs() const { return inputPins.size(); }
+size_t PortaMulti::getNumInputs() const { return pinosEntrada.size(); }
 
 // Total de entradas no vetor
-size_t MultiInputGate::getInputCount() const { return inputPins.size(); }
+size_t PortaMulti::getInputCount() const { return pinosEntrada.size(); }
 
 // Construtor da porta NOT
-NotGate::NotGate(int compId, float x, float y) : UnaryGate(compId, "NOT", x, y) {}
+PortaNot::PortaNot(int compId, float x, float y) : PortaSimples(compId, "NOT", x, y) {}
 
 // Inverte o sinal que chegou na entrada
-void NotGate::evaluate() { outputPin.setState(!inputPin.getState()); }
+void PortaNot::evaluate() { pinoSaida.setState(!pinoEntrada.getState()); }
 
 // Cria uma cópia da NOT
-Component* NotGate::clone() const { return new NotGate(*this); }
+Componente* PortaNot::clone() const { return new PortaNot(*this); }
 
 // Construtor da AND (já coloca o número de entradas no nome, tipo AND_2)
-AndGate::AndGate(int compId, size_t numInputs, float x, float y)
-    : MultiInputGate(compId, "AND_" + std::to_string(numInputs), numInputs, x, y) {}
+PortaAnd::PortaAnd(int compId, size_t qtdEntradas, float x, float y)
+    : PortaMulti(compId, "AND_" + std::to_string(qtdEntradas), qtdEntradas, x, y) {}
 
 // Faz o E lógico de todas as entradas
-void AndGate::evaluate() {
-    bool result = true;
-    for (const auto& pin : inputPins) result = result && pin.getState();
-    outputPin.setState(result);
+void PortaAnd::evaluate() {
+    bool res = true;
+    for (const auto& p : pinosEntrada) res = res && p.getState();
+    pinoSaida.setState(res);
 }
 
 // Cria uma cópia da AND
-Component* AndGate::clone() const { return new AndGate(*this); }
+Componente* PortaAnd::clone() const { return new PortaAnd(*this); }
 
 // Construtor da NAND
-NandGate::NandGate(int compId, size_t numInputs, float x, float y)
-    : MultiInputGate(compId, "NAND_" + std::to_string(numInputs), numInputs, x, y) {}
+PortaNand::PortaNand(int compId, size_t qtdEntradas, float x, float y)
+    : PortaMulti(compId, "NAND_" + std::to_string(qtdEntradas), qtdEntradas, x, y) {}
 
 // Faz o AND de tudo e inverte no final
-void NandGate::evaluate() {
-    bool result = true;
-    for (const auto& pin : inputPins) result = result && pin.getState();
-    outputPin.setState(!result);
+void PortaNand::evaluate() {
+    bool res = true;
+    for (const auto& p : pinosEntrada) res = res && p.getState();
+    pinoSaida.setState(!res);
 }
 
 // Cria uma cópia da NAND
-Component* NandGate::clone() const { return new NandGate(*this); }
+Componente* PortaNand::clone() const { return new PortaNand(*this); }
 
 // Construtor da OR
-OrGate::OrGate(int compId, size_t numInputs, float x, float y)
-    : MultiInputGate(compId, "OR_" + std::to_string(numInputs), numInputs, x, y) {}
+PortaOr::PortaOr(int compId, size_t qtdEntradas, float x, float y)
+    : PortaMulti(compId, "OR_" + std::to_string(qtdEntradas), qtdEntradas, x, y) {}
 
 // Faz o OU lógico (basta uma entrada ser true pra sair true)
-void OrGate::evaluate() {
-    bool result = false;
-    for (const auto& pin : inputPins) result = result || pin.getState();
-    outputPin.setState(result);
+void PortaOr::evaluate() {
+    bool res = false;
+    for (const auto& p : pinosEntrada) res = res || p.getState();
+    pinoSaida.setState(res);
 }
 
 // Cria uma cópia da OR
-Component* OrGate::clone() const { return new OrGate(*this); }
+Componente* PortaOr::clone() const { return new PortaOr(*this); }
 
 // Construtor da NOR
-NorGate::NorGate(int compId, size_t numInputs, float x, float y)
-    : MultiInputGate(compId, "NOR_" + std::to_string(numInputs), numInputs, x, y) {}
+PortaNor::PortaNor(int compId, size_t qtdEntradas, float x, float y)
+    : PortaMulti(compId, "NOR_" + std::to_string(qtdEntradas), qtdEntradas, x, y) {}
 
 // Faz o OR das entradas e inverte o resultado
-void NorGate::evaluate() {
-    bool result = false;
-    for (const auto& pin : inputPins) result = result || pin.getState();
-    outputPin.setState(!result);
+void PortaNor::evaluate() {
+    bool res = false;
+    for (const auto& p : pinosEntrada) res = res || p.getState();
+    pinoSaida.setState(!res);
 }
 
 // Cria uma cópia da NOR
-Component* NorGate::clone() const { return new NorGate(*this); }
+Componente* PortaNor::clone() const { return new PortaNor(*this); }
 
 // Construtor da XOR
-XorGate::XorGate(int compId, size_t numInputs, float x, float y)
-    : MultiInputGate(compId, "XOR_" + std::to_string(numInputs), numInputs, x, y) {}
+PortaXor::PortaXor(int compId, size_t qtdEntradas, float x, float y)
+    : PortaMulti(compId, "XOR_" + std::to_string(qtdEntradas), qtdEntradas, x, y) {}
 
 // OU exclusivo: vai alternando o resultado a cada entrada ligada
-void XorGate::evaluate() {
-    bool result = false;
-    for (const auto& pin : inputPins) result = (result != pin.getState());
-    outputPin.setState(result);
+void PortaXor::evaluate() {
+    bool res = false;
+    for (const auto& p : pinosEntrada) res = (res != p.getState());
+    pinoSaida.setState(res);
 }
 
 // Cria uma cópia da XOR
-Component* XorGate::clone() const { return new XorGate(*this); }
+Componente* PortaXor::clone() const { return new PortaXor(*this); }
 
 // Cria a chave de entrada já com o estado inicial escolhido
-InputSwitch::InputSwitch(int compId, const std::string& compName, bool initialState, float x, float y)
-    : Component(compId, compName, x, y), outputPin(initialState) {}
+Chave::Chave(int compId, const std::string& compNome, bool estadoInicial, float x, float y)
+    : Componente(compId, compNome, x, y), pinoSaida(estadoInicial) {}
 
 // Muda a chave de 0 pra 1 ou de 1 pra 0
-void InputSwitch::toggle() { outputPin.setState(!outputPin.getState()); }
+void Chave::toggle() { pinoSaida.setState(!pinoSaida.getState()); }
 
 // Muda o estado da chave diretamente
-void InputSwitch::setState(bool state) { outputPin.setState(state); }
+void Chave::setState(bool estado) { pinoSaida.setState(estado); }
 
 // Não faz nada no evaluate porque o valor da chave quem controla é o usuário
-void InputSwitch::evaluate() {}
+void Chave::evaluate() {}
 
 // Cria uma cópia da chave
-Component* InputSwitch::clone() const { return new InputSwitch(*this); }
+Componente* Chave::clone() const { return new Chave(*this); }
 
 // Retorna o pino de saída da chave
-Pin<bool>* InputSwitch::getOutputPin() { return &outputPin; }
+Pino<bool>* Chave::getOutputPin() { return &pinoSaida; }
 
 // Chave não tem pino de entrada
-Pin<bool>* InputSwitch::getInputPin(size_t) { return nullptr; }
+Pino<bool>* Chave::getInputPin(size_t) { return nullptr; }
 
 // 0 entradas
-size_t InputSwitch::getInputCount() const { return 0; }
+size_t Chave::getInputCount() const { return 0; }
 
 // Cria o LED de saída (começa apagado)
-OutputLED::OutputLED(int compId, const std::string& compName, float x, float y)
-    : Component(compId, compName, x, y), inputPin(false) {}
+Led::Led(int compId, const std::string& compNome, float x, float y)
+    : Componente(compId, compNome, x, y), pinoEntrada(false) {}
 
 // Verifica se está chegando sinal 1 no LED
-bool OutputLED::isLit() const { return inputPin.getState(); }
+bool Led::isLit() const { return pinoEntrada.getState(); }
 
 // O LED só mostra o que chegou no pino de entrada, então não calcula nada aqui
-void OutputLED::evaluate() {}
+void Led::evaluate() {}
 
 // Cria uma cópia do LED
-Component* OutputLED::clone() const { return new OutputLED(*this); }
+Componente* Led::clone() const { return new Led(*this); }
 
 // LED não tem saída
-Pin<bool>* OutputLED::getOutputPin() { return nullptr; }
+Pino<bool>* Led::getOutputPin() { return nullptr; }
 
 // Retorna o único pino de entrada do LED (índice 0)
-Pin<bool>* OutputLED::getInputPin(size_t index) { return (index == 0) ? &inputPin : nullptr; }
+Pino<bool>* Led::getInputPin(size_t index) { return (index == 0) ? &pinoEntrada : nullptr; }
 
 // LED só tem 1 entrada
-size_t OutputLED::getInputCount() const { return 1; }
+size_t Led::getInputCount() const { return 1; }
 
 #if !defined(MULTI_FILE_BUILD) && !defined(LOGIC_SIM_UNITY_INCLUDED)
 #include "gui/main_gui.cpp"

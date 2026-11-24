@@ -12,35 +12,35 @@
 #include <cmath>
 
 namespace {
-const sf::Color COLOR_WIRE_ON(60, 220, 90);
-const sf::Color COLOR_WIRE_OFF(120, 124, 132);
-const sf::Color COLOR_GATE_BODY(40, 70, 130);
-const sf::Color COLOR_SWITCH_OFF(70, 74, 82);
-const sf::Color COLOR_SWITCH_ON(30, 140, 70);
-const sf::Color COLOR_LED_BODY(55, 45, 70);
-const sf::Color COLOR_LED_OFF(90, 90, 90);
-const sf::Color COLOR_LED_ON(170, 255, 80);
-const sf::Color COLOR_OUTLINE(200, 205, 215);
-const sf::Color COLOR_TEXT(240, 240, 245);
-const sf::Color COLOR_HOVER(255, 220, 60);
-const sf::Color COLOR_WIRE_HOVER(255, 110, 90);
+const sf::Color COR_FIO_ON(60, 220, 90);
+const sf::Color COR_FIO_OFF(120, 124, 132);
+const sf::Color COR_PORTA(40, 70, 130);
+const sf::Color COR_CHAVE_OFF(70, 74, 82);
+const sf::Color COR_CHAVE_ON(30, 140, 70);
+const sf::Color COR_CORPO_LED(55, 45, 70);
+const sf::Color COR_LED_APAGADO(90, 90, 90);
+const sf::Color COR_LED_ACESO(170, 255, 80);
+const sf::Color COR_BORDA(200, 205, 215);
+const sf::Color COR_TEXTO(240, 240, 245);
+const sf::Color COR_DESTAQUE(255, 220, 60);
+const sf::Color COR_FIO_HOVER(255, 110, 90);
 
 // Calcula a distância entre dois pontos 2D
-float distance(sf::Vector2f a, sf::Vector2f b) {
-    const sf::Vector2f d = b - a;
-    return std::sqrt(d.x * d.x + d.y * d.y);
+float distancia(sf::Vector2f a, sf::Vector2f b) {
+    const sf::Vector2f diff = b - a;
+    return std::sqrt(diff.x * diff.x + diff.y * diff.y);
 }
 
 // Menor distância de um ponto até um segmento de reta (usado pra clicar no fio)
-float pointToSegmentDistance(sf::Vector2f p, sf::Vector2f a, sf::Vector2f b) {
+float distPontoSegmento(sf::Vector2f p, sf::Vector2f a, sf::Vector2f b) {
     const sf::Vector2f ab = b - a;
-    const float lenSq = ab.x * ab.x + ab.y * ab.y;
-    if (lenSq < 0.0001f) return distance(p, a);
-    float t = ((p.x - a.x) * ab.x + (p.y - a.y) * ab.y) / lenSq;
+    const float tamQuad = ab.x * ab.x + ab.y * ab.y;
+    if (tamQuad < 0.0001f) return distancia(p, a);
+    float t = ((p.x - a.x) * ab.x + (p.y - a.y) * ab.y) / tamQuad;
     if (t < 0.0f) t = 0.0f;
     if (t > 1.0f) t = 1.0f;
     const sf::Vector2f proj{a.x + t * ab.x, a.y + t * ab.y};
-    return distance(p, proj);
+    return distancia(p, proj);
 }
 }
 
@@ -50,35 +50,35 @@ sf::String toSfString(const std::string& utf8) {
 }
 
 // Inicializa o renderizador guardando a fonte
-GuiRenderer::GuiRenderer(const sf::Font& fontRef) : font(fontRef) {}
+Desenhista::Desenhista(const sf::Font& fonteRef) : fonte(fonteRef) {}
 
 // Retorna a caixa (retângulo) onde fica o corpo do componente
-sf::FloatRect GuiRenderer::bodyRect(const Component& comp) {
+sf::FloatRect Desenhista::bodyRect(const Componente& comp) {
     return sf::FloatRect({comp.getX(), comp.getY()}, {BODY_WIDTH, BODY_HEIGHT});
 }
 
 // Posição do pino de saída (no meio do lado direito)
-sf::Vector2f GuiRenderer::outputPinPos(const Component& comp) {
+sf::Vector2f Desenhista::outputPinPos(const Componente& comp) {
     return {comp.getX() + BODY_WIDTH, comp.getY() + BODY_HEIGHT / 2.0f};
 }
 
 // Posição de cada pino de entrada (distribuídos no lado esquerdo)
-sf::Vector2f GuiRenderer::inputPinPos(const Component& comp, size_t index) {
-    const float count = static_cast<float>(comp.getInputCount());
-    const float step = BODY_HEIGHT / (count + 1.0f);
-    return {comp.getX(), comp.getY() + step * static_cast<float>(index + 1)};
+sf::Vector2f Desenhista::inputPinPos(const Componente& comp, size_t index) {
+    const float qtd = static_cast<float>(comp.getInputCount());
+    const float passo = BODY_HEIGHT / (qtd + 1.0f);
+    return {comp.getX(), comp.getY() + passo * static_cast<float>(index + 1)};
 }
 
 // Vê se o ponto está dentro do raio do pino de saída
-bool GuiRenderer::hitOutputPin(Component& comp, sf::Vector2f point) {
+bool Desenhista::hitOutputPin(Componente& comp, sf::Vector2f ponto) {
     return comp.getOutputPin() != nullptr &&
-           distance(point, outputPinPos(comp)) <= PIN_HIT_RADIUS;
+           distancia(ponto, outputPinPos(comp)) <= PIN_HIT_RADIUS;
 }
 
 // Testa se o ponto bateu em algum pino de entrada e retorna qual foi (ou -1)
-int GuiRenderer::hitInputPin(const Component& comp, sf::Vector2f point) {
+int Desenhista::hitInputPin(const Componente& comp, sf::Vector2f ponto) {
     for (size_t i = 0; i < comp.getInputCount(); ++i) {
-        if (distance(point, inputPinPos(comp, i)) <= PIN_HIT_RADIUS) {
+        if (distancia(ponto, inputPinPos(comp, i)) <= PIN_HIT_RADIUS) {
             return static_cast<int>(i);
         }
     }
@@ -86,37 +86,37 @@ int GuiRenderer::hitInputPin(const Component& comp, sf::Vector2f point) {
 }
 
 // Cria os pontos do caminho dobrado em 90 graus pro fio ligar dois pinos
-std::vector<sf::Vector2f> GuiRenderer::wirePolyline(sf::Vector2f from, sf::Vector2f to, int lane) {
-    const float margin = 18.0f;
-    if (to.x < from.x + 2.0f * margin) {
-        const float outX = from.x + margin;
-        const float inX = to.x - margin - 8.0f * static_cast<float>(lane < 0 ? 0 : lane);
-        const float midY = (from.y + to.y) / 2.0f;
-        return {from, {outX, from.y}, {outX, midY}, {inX, midY}, {inX, to.y}, to};
+std::vector<sf::Vector2f> Desenhista::wirePolyline(sf::Vector2f de, sf::Vector2f para, int trilha) {
+    const float margem = 18.0f;
+    if (para.x < de.x + 2.0f * margem) {
+        const float saidaX = de.x + margem;
+        const float entradaX = para.x - margem - 8.0f * static_cast<float>(trilha < 0 ? 0 : trilha);
+        const float meioY = (de.y + para.y) / 2.0f;
+        return {de, {saidaX, de.y}, {saidaX, meioY}, {entradaX, meioY}, {entradaX, para.y}, para};
     }
 
-    float midX = (from.x + to.x) / 2.0f;
-    const float laneX = to.x - 22.0f - 14.0f * static_cast<float>(lane);
-    if (lane >= 0 && laneX > from.x + 15.0f) {
-        midX = laneX;
+    float meioX = (de.x + para.x) / 2.0f;
+    const float trilhaX = para.x - 22.0f - 14.0f * static_cast<float>(trilha);
+    if (trilha >= 0 && trilhaX > de.x + 15.0f) {
+        meioX = trilhaX;
     }
-    return {from, {midX, from.y}, {midX, to.y}, to};
+    return {de, {meioX, de.y}, {meioX, para.y}, para};
 }
 
 // Checa se o mouse está perto o suficiente de algum trecho de fio
-int GuiRenderer::hitWire(const CircuitBoard& board, sf::Vector2f point) {
-    constexpr float HIT_TOLERANCE = 6.5f;
-    for (size_t i = board.getWireCount(); i-- > 0;) {
-        const Wire* wire = board.getWire(i);
-        const Component* src = board.findComponent(wire->getSourceId());
-        const Component* dst = board.findComponent(wire->getDestId());
-        if (!src || !dst) continue;
+int Desenhista::hitWire(const Placa& placa, sf::Vector2f ponto) {
+    constexpr float TOLERANCIA = 6.5f;
+    for (size_t i = placa.getWireCount(); i-- > 0;) {
+        const Fio* fio = placa.getWire(i);
+        const Componente* orig = placa.findComponent(fio->getSourceId());
+        const Componente* dest = placa.findComponent(fio->getDestId());
+        if (!orig || !dest) continue;
 
-        const auto pts = wirePolyline(outputPinPos(*src),
-                                      inputPinPos(*dst, wire->getDestPinIndex()),
-                                      static_cast<int>(wire->getDestPinIndex()));
+        const auto pts = wirePolyline(outputPinPos(*orig),
+                                      inputPinPos(*dest, fio->getDestPinIndex()),
+                                      static_cast<int>(fio->getDestPinIndex()));
         for (size_t s = 0; s + 1 < pts.size(); ++s) {
-            if (pointToSegmentDistance(point, pts[s], pts[s + 1]) <= HIT_TOLERANCE) {
+            if (distPontoSegmento(ponto, pts[s], pts[s + 1]) <= TOLERANCIA) {
                 return static_cast<int>(i);
             }
         }
@@ -125,148 +125,148 @@ int GuiRenderer::hitWire(const CircuitBoard& board, sf::Vector2f point) {
 }
 
 // Desenha uma linha grossa entre os pontos A e B
-void GuiRenderer::drawSegment(sf::RenderTarget& target, sf::Vector2f a, sf::Vector2f b,
-                              sf::Color color) const {
+void Desenhista::drawSegment(sf::RenderTarget& target, sf::Vector2f a, sf::Vector2f b,
+                             sf::Color cor) const {
     const sf::Vector2f d = b - a;
-    const float length = distance(a, b);
-    if (length < 0.01f) return;
+    const float comp = distancia(a, b);
+    if (comp < 0.01f) return;
 
-    sf::RectangleShape line({length, WIRE_THICKNESS});
-    line.setOrigin({0.0f, WIRE_THICKNESS / 2.0f});
-    line.setPosition(a);
-    line.setRotation(sf::radians(std::atan2(d.y, d.x)));
-    line.setFillColor(color);
-    target.draw(line);
+    sf::RectangleShape linha({comp, WIRE_THICKNESS});
+    linha.setOrigin({0.0f, WIRE_THICKNESS / 2.0f});
+    linha.setPosition(a);
+    linha.setRotation(sf::radians(std::atan2(d.y, d.x)));
+    linha.setFillColor(cor);
+    target.draw(linha);
 
-    sf::CircleShape joint(WIRE_THICKNESS / 2.0f);
-    joint.setOrigin({WIRE_THICKNESS / 2.0f, WIRE_THICKNESS / 2.0f});
-    joint.setPosition(b);
-    joint.setFillColor(color);
-    target.draw(joint);
+    sf::CircleShape dobra(WIRE_THICKNESS / 2.0f);
+    dobra.setOrigin({WIRE_THICKNESS / 2.0f, WIRE_THICKNESS / 2.0f});
+    dobra.setPosition(b);
+    dobra.setFillColor(cor);
+    target.draw(dobra);
 }
 
 // Desenha o fio completo ligando todos os segmentos dele
-void GuiRenderer::drawWire(sf::RenderTarget& target, sf::Vector2f from, sf::Vector2f to,
-                           sf::Color color, int lane) const {
-    const auto pts = wirePolyline(from, to, lane);
+void Desenhista::drawWire(sf::RenderTarget& target, sf::Vector2f de, sf::Vector2f para,
+                          sf::Color cor, int trilha) const {
+    const auto pts = wirePolyline(de, para, trilha);
     for (size_t s = 0; s + 1 < pts.size(); ++s) {
-        drawSegment(target, pts[s], pts[s + 1], color);
+        drawSegment(target, pts[s], pts[s + 1], cor);
     }
 }
 
 // Desenha um texto na posição (x, y) normal
-void GuiRenderer::drawText(sf::RenderTarget& target, const std::string& text,
-                           sf::Vector2f topLeft, unsigned int size, sf::Color color) const {
-    sf::Text label(font, toSfString(text), size);
-    label.setFillColor(color);
-    label.setPosition(topLeft);
-    target.draw(label);
+void Desenhista::drawText(sf::RenderTarget& target, const std::string& texto,
+                          sf::Vector2f topoEsq, unsigned int tamanho, sf::Color cor) const {
+    sf::Text rotulo(fonte, toSfString(texto), tamanho);
+    rotulo.setFillColor(cor);
+    rotulo.setPosition(topoEsq);
+    target.draw(rotulo);
 }
 
 // Desenha um texto centralizado no ponto informado
-void GuiRenderer::drawCenteredText(sf::RenderTarget& target, const std::string& text,
-                                   sf::Vector2f center, unsigned int size, sf::Color color) const {
-    sf::Text label(font, toSfString(text), size);
-    label.setFillColor(color);
-    const sf::FloatRect bounds = label.getLocalBounds();
-    label.setOrigin({bounds.position.x + bounds.size.x / 2.0f,
-                     bounds.position.y + bounds.size.y / 2.0f});
-    label.setPosition(center);
-    target.draw(label);
+void Desenhista::drawCenteredText(sf::RenderTarget& target, const std::string& texto,
+                                  sf::Vector2f centro, unsigned int tamanho, sf::Color cor) const {
+    sf::Text rotulo(fonte, toSfString(texto), tamanho);
+    rotulo.setFillColor(cor);
+    const sf::FloatRect limites = rotulo.getLocalBounds();
+    rotulo.setOrigin({limites.position.x + limites.size.x / 2.0f,
+                      limites.position.y + limites.size.y / 2.0f});
+    rotulo.setPosition(centro);
+    target.draw(rotulo);
 }
 
 // Desenha o círculo de um pino (aumenta um pouco se o mouse estiver em cima)
-void GuiRenderer::drawPin(sf::RenderTarget& target, sf::Vector2f center, bool state,
-                          bool hovered) const {
-    const float radius = hovered ? PIN_RADIUS + 2.0f : PIN_RADIUS;
-    sf::CircleShape pin(radius);
-    pin.setOrigin({radius, radius});
-    pin.setPosition(center);
-    pin.setFillColor(state ? COLOR_WIRE_ON : COLOR_WIRE_OFF);
-    pin.setOutlineThickness(2.0f);
-    pin.setOutlineColor(hovered ? COLOR_HOVER : COLOR_OUTLINE);
-    target.draw(pin);
+void Desenhista::drawPin(sf::RenderTarget& target, sf::Vector2f centro, bool estado,
+                         bool mouseEmCima) const {
+    const float raio = mouseEmCima ? PIN_RADIUS + 2.0f : PIN_RADIUS;
+    sf::CircleShape pino(raio);
+    pino.setOrigin({raio, raio});
+    pino.setPosition(centro);
+    pino.setFillColor(estado ? COR_FIO_ON : COR_FIO_OFF);
+    pino.setOutlineThickness(2.0f);
+    pino.setOutlineColor(mouseEmCima ? COR_DESTAQUE : COR_BORDA);
+    target.draw(pino);
 }
 
 // Desenha o componente inteiro (corpo, textos, LED/chave e pinos)
-void GuiRenderer::drawComponent(sf::RenderTarget& target, Component& comp,
-                                sf::Vector2f mouse) const {
-    const sf::FloatRect rect = bodyRect(comp);
+void Desenhista::drawComponent(sf::RenderTarget& target, Componente& comp,
+                               sf::Vector2f mouse) const {
+    const sf::FloatRect caixa = bodyRect(comp);
 
-    const auto* sw = dynamic_cast<const InputSwitch*>(&comp);
-    const auto* led = dynamic_cast<const OutputLED*>(&comp);
+    const auto* ch = dynamic_cast<const Chave*>(&comp);
+    const auto* led = dynamic_cast<const Led*>(&comp);
 
-    sf::Color bodyColor = COLOR_GATE_BODY;
-    if (sw) {
-        bodyColor = comp.getOutputPin()->getState() ? COLOR_SWITCH_ON : COLOR_SWITCH_OFF;
+    sf::Color corCorpo = COR_PORTA;
+    if (ch) {
+        corCorpo = comp.getOutputPin()->getState() ? COR_CHAVE_ON : COR_CHAVE_OFF;
     } else if (led) {
-        bodyColor = COLOR_LED_BODY;
+        corCorpo = COR_CORPO_LED;
     }
 
-    sf::RectangleShape body(rect.size);
-    body.setPosition(rect.position);
-    body.setFillColor(bodyColor);
-    body.setOutlineThickness(2.0f);
-    body.setOutlineColor(COLOR_OUTLINE);
-    target.draw(body);
+    sf::RectangleShape corpo(caixa.size);
+    corpo.setPosition(caixa.position);
+    corpo.setFillColor(corCorpo);
+    corpo.setOutlineThickness(2.0f);
+    corpo.setOutlineColor(COR_BORDA);
+    target.draw(corpo);
 
-    const sf::Vector2f center = rect.getCenter();
-    const std::string idLabel = "#" + std::to_string(comp.getId());
+    const sf::Vector2f centro = caixa.getCenter();
+    const std::string tagId = "#" + std::to_string(comp.getId());
 
     if (led) {
         const float r = 15.0f;
-        sf::CircleShape bulb(r);
-        bulb.setOrigin({r, r});
-        bulb.setPosition({center.x + 12.0f, center.y});
-        bulb.setFillColor(led->isLit() ? COLOR_LED_ON : COLOR_LED_OFF);
-        bulb.setOutlineThickness(2.0f);
-        bulb.setOutlineColor(COLOR_OUTLINE);
-        target.draw(bulb);
-        drawCenteredText(target, comp.getName(), {center.x, rect.position.y - 12.0f}, 13, COLOR_TEXT);
-        drawCenteredText(target, idLabel, {rect.position.x + 28.0f, center.y}, 12, COLOR_TEXT);
-    } else if (sw) {
-        const bool on = comp.getOutputPin()->getState();
-        drawCenteredText(target, comp.getName(), {center.x, center.y - 14.0f}, 12, COLOR_TEXT);
-        drawCenteredText(target, on ? "1  (ON)" : "0  (OFF)", {center.x, center.y + 4.0f}, 14, COLOR_TEXT);
-        drawCenteredText(target, idLabel, {center.x, center.y + 21.0f}, 10, COLOR_TEXT);
+        sf::CircleShape lampada(r);
+        lampada.setOrigin({r, r});
+        lampada.setPosition({centro.x + 12.0f, centro.y});
+        lampada.setFillColor(led->isLit() ? COR_LED_ACESO : COR_LED_APAGADO);
+        lampada.setOutlineThickness(2.0f);
+        lampada.setOutlineColor(COR_BORDA);
+        target.draw(lampada);
+        drawCenteredText(target, comp.getName(), {centro.x, caixa.position.y - 12.0f}, 13, COR_TEXTO);
+        drawCenteredText(target, tagId, {caixa.position.x + 28.0f, centro.y}, 12, COR_TEXTO);
+    } else if (ch) {
+        const bool ligada = comp.getOutputPin()->getState();
+        drawCenteredText(target, comp.getName(), {centro.x, centro.y - 14.0f}, 12, COR_TEXTO);
+        drawCenteredText(target, ligada ? "1  (ON)" : "0  (OFF)", {centro.x, centro.y + 4.0f}, 14, COR_TEXTO);
+        drawCenteredText(target, tagId, {centro.x, centro.y + 21.0f}, 10, COR_TEXTO);
     } else {
-        drawCenteredText(target, comp.getName(), {center.x, center.y - 8.0f}, 16, COLOR_TEXT);
-        drawCenteredText(target, idLabel, {center.x, center.y + 14.0f}, 11, COLOR_TEXT);
+        drawCenteredText(target, comp.getName(), {centro.x, centro.y - 8.0f}, 16, COR_TEXTO);
+        drawCenteredText(target, tagId, {centro.x, centro.y + 14.0f}, 11, COR_TEXTO);
     }
 
     for (size_t i = 0; i < comp.getInputCount(); ++i) {
-        const Pin<bool>* in = comp.getInputPin(i);
+        const Pino<bool>* pinoIn = comp.getInputPin(i);
         const sf::Vector2f pos = inputPinPos(comp, i);
-        drawPin(target, pos, in && in->getState(), distance(mouse, pos) <= PIN_HIT_RADIUS);
+        drawPin(target, pos, pinoIn && pinoIn->getState(), distancia(mouse, pos) <= PIN_HIT_RADIUS);
     }
 
-    if (const Pin<bool>* out = comp.getOutputPin()) {
+    if (const Pino<bool>* pinoOut = comp.getOutputPin()) {
         const sf::Vector2f pos = outputPinPos(comp);
-        drawPin(target, pos, out->getState(), distance(mouse, pos) <= PIN_HIT_RADIUS);
+        drawPin(target, pos, pinoOut->getState(), distancia(mouse, pos) <= PIN_HIT_RADIUS);
     }
 }
 
 // Desenha todos os fios primeiro e depois os componentes por cima
-void GuiRenderer::drawBoard(sf::RenderTarget& target, const CircuitBoard& board,
-                            sf::Vector2f mouse) const {
-    const int hoveredWire = hitWire(board, mouse);
+void Desenhista::drawBoard(sf::RenderTarget& target, const Placa& placa,
+                           sf::Vector2f mouse) const {
+    const int fioHover = hitWire(placa, mouse);
 
-    for (size_t i = 0; i < board.getWireCount(); ++i) {
-        const Wire* wire = board.getWire(i);
-        const Component* src = board.findComponent(wire->getSourceId());
-        const Component* dst = board.findComponent(wire->getDestId());
-        if (!src || !dst) continue;
+    for (size_t i = 0; i < placa.getWireCount(); ++i) {
+        const Fio* fio = placa.getWire(i);
+        const Componente* orig = placa.findComponent(fio->getSourceId());
+        const Componente* dest = placa.findComponent(fio->getDestId());
+        if (!orig || !dest) continue;
 
-        sf::Color wireColor = wire->getWireState() ? COLOR_WIRE_ON : COLOR_WIRE_OFF;
-        if (static_cast<int>(i) == hoveredWire) {
-            wireColor = COLOR_WIRE_HOVER;
+        sf::Color corFio = fio->getWireState() ? COR_FIO_ON : COR_FIO_OFF;
+        if (static_cast<int>(i) == fioHover) {
+            corFio = COR_FIO_HOVER;
         }
-        drawWire(target, outputPinPos(*src), inputPinPos(*dst, wire->getDestPinIndex()),
-                 wireColor, static_cast<int>(wire->getDestPinIndex()));
+        drawWire(target, outputPinPos(*orig), inputPinPos(*dest, fio->getDestPinIndex()),
+                 corFio, static_cast<int>(fio->getDestPinIndex()));
     }
 
-    for (size_t i = 0; i < board.getComponentCount(); ++i) {
-        drawComponent(target, *board.getComponent(i), mouse);
+    for (size_t i = 0; i < placa.getComponentCount(); ++i) {
+        drawComponent(target, *placa.getComponent(i), mouse);
     }
 }
 

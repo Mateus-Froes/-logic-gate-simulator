@@ -4,7 +4,7 @@
         {
             "type": "cppbuild",
             "label": "C/C++: g++.exe build active file",
-            "command": "C:/msys2/ucrt64/bin/g++.exe",
+            "command": "C:/msys64/ucrt64/bin/g++.exe",
             "args": [
                 "-fdiagnostics-color=always",
                 "-std=c++17",
@@ -34,7 +34,7 @@
         {
             "type": "cppbuild",
             "label": "Build GUI (SFML 3)",
-            "command": "C:/msys2/ucrt64/bin/g++.exe",
+            "command": "C:/msys64/ucrt64/bin/g++.exe",
             "args": [
                 "-fdiagnostics-color=always",
                 "-std=c++17",
@@ -68,7 +68,7 @@
         {
             "type": "cppbuild",
             "label": "Build Core (Terminal)",
-            "command": "C:/msys2/ucrt64/bin/g++.exe",
+            "command": "C:/msys64/ucrt64/bin/g++.exe",
             "args": [
                 "-fdiagnostics-color=always",
                 "-std=c++17",

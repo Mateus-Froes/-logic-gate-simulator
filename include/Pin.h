@@ -2,35 +2,35 @@
 #define PIN_H
 
 template <typename T>
-class Pin {
+class Pino {
 private:
-    T state;
-    bool connected;
+    T valor;
+    bool ligado;
 
 public:
-    // Começa o pino desconectado e com o estado inicial passado
-    explicit Pin(T initialState = T()) : state(initialState), connected(false) {}
+    // Começa o pino desligado e com o valor inicial passado
+    explicit Pino(T valorInicial = T()) : valor(valorInicial), ligado(false) {}
 
     // Muda o valor do sinal no pino
-    void setState(T newState) { state = newState; }
+    void setState(T novoValor) { valor = novoValor; }
 
     // Pega o valor atual do sinal
-    T getState() const { return state; }
+    T getState() const { return valor; }
 
-    // Marca se o pino está conectado a algum fio ou não
-    void setConnected(bool status) { connected = status; }
+    // Marca se o pino está ligado a algum fio ou não
+    void setConnected(bool status) { ligado = status; }
 
     // Diz se tem fio ligado nesse pino
-    bool isConnected() const { return connected; }
+    bool isConnected() const { return ligado; }
 
-    // Compara se dois pinos têm o mesmo estado e conexão
-    bool operator==(const Pin<T>& other) const {
-        return (state == other.state) && (connected == other.connected);
+    // Compara se dois pinos têm o mesmo valor e conexão
+    bool operator==(const Pino<T>& outro) const {
+        return (valor == outro.valor) && (ligado == outro.ligado);
     }
 
     // Compara se dois pinos são diferentes
-    bool operator!=(const Pin<T>& other) const {
-        return !(*this == other);
+    bool operator!=(const Pino<T>& outro) const {
+        return !(*this == outro);
     }
 };
 

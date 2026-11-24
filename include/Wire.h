@@ -5,17 +5,17 @@
 #include "Component.h"
 #include "Pin.h"
 
-class Wire {
+class Fio {
 private:
-    int sourceCompId;
-    int destCompId;
-    size_t destPinIndex;
-    Pin<bool>* sourcePin;
-    Pin<bool>* destPin;
+    int idOrigem;
+    int idDestino;
+    size_t indicePinoDestino;
+    Pino<bool>* pinoOrigem;
+    Pino<bool>* pinoDestino;
 
 public:
     // Cria um fio ligando o pino de saída de um componente na entrada de outro
-    Wire(int srcId, Pin<bool>* src, int dstId, Pin<bool>* dst, size_t dstIdx);
+    Fio(int srcId, Pino<bool>* src, int dstId, Pino<bool>* dst, size_t dstIdx);
 
     // Passa o sinal do pino de origem pro pino de destino
     void propagate();
@@ -24,7 +24,7 @@ public:
     void disconnectInputPin();
 
     // Atualiza os ponteiros dos pinos (útil depois de clonar a placa)
-    void rebind(Component* srcComp, Component* dstComp);
+    void rebind(Componente* srcComp, Componente* dstComp);
 
     // Pega o ID do componente de onde o fio sai
     int getSourceId() const;
@@ -39,7 +39,7 @@ public:
     bool getWireState() const;
 
     // Dois fios são considerados iguais se vão para a mesma entrada do mesmo componente
-    bool operator==(const Wire& other) const;
+    bool operator==(const Fio& outro) const;
 };
 
 #endif

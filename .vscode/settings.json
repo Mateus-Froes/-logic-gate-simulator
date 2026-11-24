@@ -13,9 +13,10 @@
         "cpp": "cd $dir && g++ -std=c++17 -Wall -Wextra \"$fileName\" -o \"$workspaceRoot/build/$fileNameWithoutExt.exe\" -lsfml-graphics -lsfml-window -lsfml-system && \"$workspaceRoot/build/$fileNameWithoutExt.exe\""
     },
     "C_Cpp.default.cppStandard": "c++17",
-    "C_Cpp.default.compilerPath": "C:/msys2/ucrt64/bin/g++.exe",
+    "C_Cpp.default.compilerPath": "C:/msys64/ucrt64/bin/g++.exe",
     "C_Cpp.default.includePath": [
         "${workspaceFolder}/include",
-        "${workspaceFolder}/**"
+        "${workspaceFolder}/**",
+        "C:/msys64/ucrt64/include"
     ]
 }

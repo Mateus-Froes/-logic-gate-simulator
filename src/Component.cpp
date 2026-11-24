@@ -8,44 +8,44 @@
 #endif
 
 // Inicializa o componente com id, nome e posição
-Component::Component(int compId, const std::string& compName, float x, float y)
-    : id(compId), name(compName), posX(x), posY(y) {}
+Componente::Componente(int compId, const std::string& compNome, float x, float y)
+    : id(compId), nome(compNome), posX(x), posY(y) {}
 
 // Destrutor padrão
-Component::~Component() = default;
+Componente::~Componente() = default;
 
 // Retorna o ID
-int Component::getId() const { return id; }
+int Componente::getId() const { return id; }
 
 // Retorna o nome
-std::string Component::getName() const { return name; }
+std::string Componente::getName() const { return nome; }
 
 // Retorna a posição X
-float Component::getX() const { return posX; }
+float Componente::getX() const { return posX; }
 
 // Retorna a posição Y
-float Component::getY() const { return posY; }
+float Componente::getY() const { return posY; }
 
 // Muda a posição X e Y na placa
-void Component::setPosition(float x, float y) {
+void Componente::setPosition(float x, float y) {
     posX = x;
     posY = y;
 }
 
 // Muda a posição usando um std::pair
-void Component::setPosition(const std::pair<float, float>& pos) {
+void Componente::setPosition(const std::pair<float, float>& pos) {
     setPosition(pos.first, pos.second);
 }
 
 // Imprime o componente formatado (id, nome, posição e saída)
-std::ostream& operator<<(std::ostream& os, const Component& comp) {
-    os << "[" << comp.id << "] " << comp.name
+std::ostream& operator<<(std::ostream& os, const Componente& comp) {
+    os << "[" << comp.id << "] " << comp.nome
        << " @(" << comp.posX << ", " << comp.posY << ")";
 
-    Component& mutableComp = const_cast<Component&>(comp);
-    const Pin<bool>* out = mutableComp.getOutputPin();
-    if (out != nullptr) {
-        os << " -> Out: " << (out->getState() ? "HIGH (1)" : "LOW (0)");
+    Componente& compMutavel = const_cast<Componente&>(comp);
+    const Pino<bool>* saida = compMutavel.getOutputPin();
+    if (saida != nullptr) {
+        os << " -> Out: " << (saida->getState() ? "HIGH (1)" : "LOW (0)");
     }
     return os;
 }

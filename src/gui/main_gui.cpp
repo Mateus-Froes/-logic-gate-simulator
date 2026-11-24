@@ -14,8 +14,8 @@
 // Ponto de entrada da versão com interface gráfica (SFML)
 int main(int argc, char* argv[]) {
     try {
-        CircuitBoard board;
-        GuiApplication app(board);
+        Placa minhaPlaca;
+        JanelaApp app(minhaPlaca);
 
         if (argc >= 3 && std::string(argv[1]) == "--snapshot") {
             return app.saveSnapshot(argv[2]) ? 0 : 1;

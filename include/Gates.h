@@ -7,43 +7,43 @@
 #include <vector>
 #include "Component.h"
 
-class LogicGate : public Component {
+class PortaLogica : public Componente {
 protected:
-    Pin<bool> outputPin;
+    Pino<bool> pinoSaida;
 
 public:
     // Porta lógica genérica, já começa com a saída em 0 (false)
-    LogicGate(int compId, const std::string& compName, float x, float y);
+    PortaLogica(int compId, const std::string& compNome, float x, float y);
 
     // Pega o pino de saída da porta
-    Pin<bool>* getOutputPin() override;
+    Pino<bool>* getOutputPin() override;
 };
 
-class UnaryGate : public LogicGate {
+class PortaSimples : public PortaLogica {
 protected:
-    Pin<bool> inputPin;
+    Pino<bool> pinoEntrada;
 
 public:
     // Porta de 1 entrada só (usada como base pro NOT)
-    UnaryGate(int compId, const std::string& compName, float x, float y);
+    PortaSimples(int compId, const std::string& compNome, float x, float y);
 
     // Só tem o pino 0; qualquer outro índice retorna nullptr
-    Pin<bool>* getInputPin(size_t index = 0) override;
+    Pino<bool>* getInputPin(size_t index = 0) override;
 
     // Sempre tem 1 entrada
     size_t getInputCount() const override;
 };
 
-class MultiInputGate : public LogicGate {
+class PortaMulti : public PortaLogica {
 protected:
-    std::vector<Pin<bool>> inputPins;
+    std::vector<Pino<bool>> pinosEntrada;
 
 public:
     // Porta com várias entradas (aceita 2 ou 3 pinos)
-    MultiInputGate(int compId, const std::string& compName, size_t numInputs, float x, float y);
+    PortaMulti(int compId, const std::string& compNome, size_t qtdEntradas, float x, float y);
 
     // Pega o pino de entrada pelo índice, se for válido
-    Pin<bool>* getInputPin(size_t index = 0) override;
+    Pino<bool>* getInputPin(size_t index = 0) override;
 
     // Quantas entradas foram configuradas nessa porta
     size_t getNumInputs() const;
@@ -52,116 +52,116 @@ public:
     size_t getInputCount() const override;
 };
 
-class NotGate : public UnaryGate {
+class PortaNot : public PortaSimples {
 public:
     // Cria uma porta NOT (inversora)
-    NotGate(int compId, float x = 0.0f, float y = 0.0f);
+    PortaNot(int compId, float x = 0.0f, float y = 0.0f);
 
     // Inverte o valor que está na entrada
     void evaluate() override;
 
     // Clona a porta NOT
-    Component* clone() const override;
+    Componente* clone() const override;
 };
 
-class AndGate : public MultiInputGate {
+class PortaAnd : public PortaMulti {
 public:
     // Cria uma porta AND de 2 ou 3 entradas
-    AndGate(int compId, size_t numInputs = 2, float x = 0.0f, float y = 0.0f);
+    PortaAnd(int compId, size_t qtdEntradas = 2, float x = 0.0f, float y = 0.0f);
 
     // Saída só dá 1 se todas as entradas forem 1
     void evaluate() override;
 
     // Clona a porta AND
-    Component* clone() const override;
+    Componente* clone() const override;
 };
 
-class NandGate : public MultiInputGate {
+class PortaNand : public PortaMulti {
 public:
     // Cria uma porta NAND de 2 ou 3 entradas
-    NandGate(int compId, size_t numInputs = 2, float x = 0.0f, float y = 0.0f);
+    PortaNand(int compId, size_t qtdEntradas = 2, float x = 0.0f, float y = 0.0f);
 
     // Faz o inverso da AND (só dá 0 se tudo for 1)
     void evaluate() override;
 
     // Clona a porta NAND
-    Component* clone() const override;
+    Componente* clone() const override;
 };
 
-class OrGate : public MultiInputGate {
+class PortaOr : public PortaMulti {
 public:
     // Cria uma porta OR de 2 ou 3 entradas
-    OrGate(int compId, size_t numInputs = 2, float x = 0.0f, float y = 0.0f);
+    PortaOr(int compId, size_t qtdEntradas = 2, float x = 0.0f, float y = 0.0f);
 
     // Saída dá 1 se pelo menos uma entrada for 1
     void evaluate() override;
 
     // Clona a porta OR
-    Component* clone() const override;
+    Componente* clone() const override;
 };
 
-class NorGate : public MultiInputGate {
+class PortaNor : public PortaMulti {
 public:
     // Cria uma porta NOR de 2 ou 3 entradas
-    NorGate(int compId, size_t numInputs = 2, float x = 0.0f, float y = 0.0f);
+    PortaNor(int compId, size_t qtdEntradas = 2, float x = 0.0f, float y = 0.0f);
 
     // Inverso da OR: só dá 1 quando todas as entradas são 0
     void evaluate() override;
 
     // Clona a porta NOR
-    Component* clone() const override;
+    Componente* clone() const override;
 };
 
-class XorGate : public MultiInputGate {
+class PortaXor : public PortaMulti {
 public:
     // Cria uma porta XOR de 2 ou 3 entradas
-    XorGate(int compId, size_t numInputs = 2, float x = 0.0f, float y = 0.0f);
+    PortaXor(int compId, size_t qtdEntradas = 2, float x = 0.0f, float y = 0.0f);
 
     // Dá 1 quando tem uma quantidade ímpar de entradas ligadas
     void evaluate() override;
 
     // Clona a porta XOR
-    Component* clone() const override;
+    Componente* clone() const override;
 };
 
-class InputSwitch : public Component {
+class Chave : public Componente {
 private:
-    Pin<bool> outputPin;
+    Pino<bool> pinoSaida;
 
 public:
     // Chave de entrada que o usuário pode ligar/desligar
-    InputSwitch(int compId, const std::string& compName, bool initialState = false,
-                float x = 0.0f, float y = 0.0f);
+    Chave(int compId, const std::string& compNome, bool estadoInicial = false,
+          float x = 0.0f, float y = 0.0f);
 
     // Inverte o estado atual da chave (0 <-> 1)
     void toggle();
 
     // Força um estado específico na chave
-    void setState(bool state);
+    void setState(bool estado);
 
     // A chave não precisa calcular nada, só mantém o valor dela
     void evaluate() override;
 
     // Clona a chave
-    Component* clone() const override;
+    Componente* clone() const override;
 
     // Pega o pino de saída da chave
-    Pin<bool>* getOutputPin() override;
+    Pino<bool>* getOutputPin() override;
 
     // Chave não tem entrada, então retorna nullptr
-    Pin<bool>* getInputPin(size_t index = 0) override;
+    Pino<bool>* getInputPin(size_t index = 0) override;
 
     // 0 entradas
     size_t getInputCount() const override;
 };
 
-class OutputLED : public Component {
+class Led : public Componente {
 private:
-    Pin<bool> inputPin;
+    Pino<bool> pinoEntrada;
 
 public:
     // LED pra mostrar o resultado de saída do circuito
-    OutputLED(int compId, const std::string& compName, float x = 0.0f, float y = 0.0f);
+    Led(int compId, const std::string& compNome, float x = 0.0f, float y = 0.0f);
 
     // Diz se o LED está aceso (entrada em 1)
     bool isLit() const;
@@ -170,13 +170,13 @@ public:
     void evaluate() override;
 
     // Clona o LED
-    Component* clone() const override;
+    Componente* clone() const override;
 
     // LED não tem pino de saída
-    Pin<bool>* getOutputPin() override;
+    Pino<bool>* getOutputPin() override;
 
     // Pega o pino de entrada do LED (índice 0)
-    Pin<bool>* getInputPin(size_t index = 0) override;
+    Pino<bool>* getInputPin(size_t index = 0) override;
 
     // LED tem só 1 entrada
     size_t getInputCount() const override;
