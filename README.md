@@ -98,6 +98,45 @@ void PortaNor::evaluate() {
 
 ```mermaid
 classDiagram
+    class Placa {
+        -Componente** listaComp
+        -size_t qtdComp
+        -size_t capComp
+        -Fio** listaFios
+        -size_t qtdFios
+        -size_t capFios
+        +Placa(size_t)
+        +Placa(const Placa&)
+        +operator=(const Placa&) Placa&
+        +~Placa()
+        +createComponent~T~(Args...) T*
+        +connect(Componente*, Componente*, size_t) bool
+        +stepSimulation() void
+        +removeComponent(Componente*) bool
+    }
+
+    class Fio {
+        -int idOrigem
+        -int idDestino
+        -size_t indicePinoDestino
+        -Pino~bool~* pinoOrigem
+        -Pino~bool~* pinoDestino
+        +propagate() void
+        +disconnectInputPin() void
+        +rebind(Componente*, Componente*) void
+        +operator==(const Fio&) bool
+    }
+
+    class Pino~T~ {
+        -T valor
+        -bool ligado
+        +setState(T) void
+        +getState() T
+        +setConnected(bool) void
+        +isConnected() bool
+        +operator==(const Pino~T~&) bool
+    }
+
     class Componente {
         <<abstract>>
         #int id
@@ -109,6 +148,7 @@ classDiagram
         +getOutputPin()* Pino~bool~*
         +getInputPin(size_t)* Pino~bool~*
         +getInputCount()* size_t
+        +setPosition(float, float) void
     }
 
     class PortaLogica {
@@ -127,6 +167,10 @@ classDiagram
         +getInputPin(size_t) Pino~bool~*
         +getInputCount() size_t
     }
+
+    Placa "1" *-- "0..*" Componente : gerencia
+    Placa "1" *-- "0..*" Fio : gerencia
+    Fio "0..*" --> "2" Pino~T~ : liga
 
     Componente <|-- PortaLogica
     Componente <|-- Chave
